@@ -19,7 +19,9 @@ export class MailService {
   }
 
   async sendVerificationCode(to: string, code: string) {
-    const from = this.config.get<string>('MAIL_FROM') || this.config.get<string>('SMTP_USER')!;
+    const from =
+      this.config.get<string>('MAIL_FROM') ||
+      this.config.get<string>('SMTP_USER')!;
     await this.transporter.sendMail({
       from,
       to,
@@ -29,8 +31,11 @@ export class MailService {
   }
 
   async sendVerificationLink(to: string, token: string) {
-    const from = this.config.get<string>('MAIL_FROM') || this.config.get<string>('SMTP_USER')!;
-    const baseUrl = this.config.get<string>('APP_PUBLIC_URL') || 'http://localhost:3000';
+    const from =
+      this.config.get<string>('MAIL_FROM') ||
+      this.config.get<string>('SMTP_USER')!;
+    const baseUrl =
+      this.config.get<string>('APP_PUBLIC_URL') || 'http://localhost:3000';
     const link = `${baseUrl}/auth/verify-email/confirm/${token}`;
 
     await this.transporter.sendMail({
@@ -49,6 +54,35 @@ export class MailService {
           border-radius:6px;
         ">Verificar correo</a>
         <p>Este enlace expira en 30 minutos.</p>
+      `,
+    });
+  }
+
+  async sendPasswordResetLink(to: string, token: string) {
+    const from =
+      this.config.get<string>('MAIL_FROM') ||
+      this.config.get<string>('SMTP_USER')!;
+    const baseUrl =
+      this.config.get<string>('APP_PUBLIC_URL') || 'http://localhost:3000';
+    const link = `${baseUrl}/auth/reset-password/confirm/${token}`;
+
+    await this.transporter.sendMail({
+      from,
+      to,
+      subject: 'Recuperación de contraseña',
+      html: `
+        <h2>Recuperación de contraseña</h2>
+        <p>Haz clic para restablecer tu contraseña:</p>
+        <a href="${link}" style="
+          display:inline-block;
+          padding:10px 16px;
+          background:#16a34a;
+          color:#fff;
+          text-decoration:none;
+          border-radius:6px;
+        ">Restablecer contraseña</a>
+        <p>Este enlace expira en 30 minutos.</p>
+        <p>Si no fuiste tú, ignora este correo.</p>
       `,
     });
   }
