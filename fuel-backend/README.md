@@ -31,6 +31,60 @@
 $ npm install
 ```
 
+## Database Setup (Prisma)
+
+Este proyecto usa Prisma como ORM con PostgreSQL. Asegúrate de tener PostgreSQL instalado y configurado.
+
+### 1. Configurar variables de entorno
+
+Crea un archivo `.env` en la raíz del proyecto con la siguiente configuración:
+
+```env
+DATABASE_URL="postgresql://usuario:password@localhost:5432/nombre_db?schema=public"
+JWT_SECRET="tu_secreto_jwt_aqui"
+MAIL_HOST="smtp.ejemplo.com"
+MAIL_PORT=587
+MAIL_USER="tu_email@ejemplo.com"
+MAIL_PASSWORD="tu_password"
+```
+
+### 2. Habilitar extensión pgcrypto en PostgreSQL
+
+Antes de ejecutar las migraciones, conecta a tu base de datos PostgreSQL y ejecuta:
+
+```sql
+CREATE EXTENSION IF NOT EXISTS "pgcrypto";
+```
+
+Esto es necesario para generar UUIDs con `gen_random_uuid()`.
+
+### 3. Ejecutar migraciones de Prisma
+
+```bash
+# Eliminar base de datos y recrearla con todas las migraciones (CUIDADO: esto borra todos los datos)
+$ npx prisma migrate reset
+
+# O aplicar migraciones pendientes sin borrar datos
+$ npx prisma migrate deploy
+
+# O crear una nueva migración después de cambios en schema.prisma
+$ npx prisma migrate dev --name nombre_de_tu_migracion
+```
+
+### 4. Generar Prisma Client
+
+Después de las migraciones, genera el cliente de Prisma:
+
+```bash
+$ npx prisma generate
+```
+
+### 5. (Opcional) Abrir Prisma Studio para ver/editar datos
+
+```bash
+$ npx prisma studio
+```
+
 ## Compile and run the project
 
 ```bash
