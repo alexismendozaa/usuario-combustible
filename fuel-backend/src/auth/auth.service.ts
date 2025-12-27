@@ -9,6 +9,7 @@ import { randomBytes } from 'crypto';
 import { UsersService } from '../users/users.service';
 import { PrismaService } from '../../prisma/prisma.service';
 import { MailService } from './mail/mail.service';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class AuthService {
@@ -17,10 +18,21 @@ export class AuthService {
     private readonly jwt: JwtService,
     private readonly prisma: PrismaService,
     private readonly mail: MailService,
+    private readonly config: ConfigService,
   ) {}
 
   private signAccessToken(payload: { sub: string; email: string }) {
-    return this.jwt.sign(payload);
+    return this.jwt.sign(payload, {
+      secret: this.config.get<string>('JWT_ACCESS_SECRET'),
+      expiresIn: `${this.config.get<number>('ACCESS_TOKEN_TTL') || 900}s`,
+    });
+  }
+
+  private signRefreshToken(payload: { sub: string; email: string }) {
+    return this.jwt.sign(payload, {
+      secret: this.config.get<string>('JWT_REFRESH_SECRET'),
+      expiresIn: `${this.config.get<number>('REFRESH_TOKEN_TTL') || 2592000}s`,
+    });
   }
 
   private generateVerifyToken(): string {
@@ -81,10 +93,25 @@ export class AuthService {
       sub: user.id,
       email: user.email,
     });
+    const refreshToken = this.signRefreshToken({
+      sub: user.id,
+      email: user.email,
+    });
+
+    const tokenHash = await bcrypt.hash(refreshToken, 10);
+    const ttlSeconds = this.config.get<number>('REFRESH_TOKEN_TTL') || 2592000;
+    await this.prisma.refreshToken.create({
+      data: {
+        userId: user.id,
+        tokenHash,
+        expiresAt: new Date(Date.now() + ttlSeconds * 1000),
+      },
+    });
 
     return {
       user: { id: user.id, email: user.email, name: user.name },
       accessToken,
+      refreshToken,
     };
   }
 
@@ -176,6 +203,67 @@ export class AuthService {
     await this.prisma.passwordResetToken.updateMany({
       where: { userId: row.userId, usedAt: null, id: { not: id } },
       data: { usedAt: new Date() },
+    });
+
+    return { ok: true };
+  }
+
+  async refresh(refreshToken: string) {
+    let payload: { sub: string; email: string };
+    try {
+      payload = this.jwt.verify(refreshToken, {
+        secret: this.config.get<string>('JWT_REFRESH_SECRET'),
+      });
+    } catch {
+      throw new UnauthorizedException('Refresh token inválido');
+    }
+
+    const user = await this.prisma.user.findUnique({
+      where: { id: payload.sub },
+    });
+    if (!user || !user.isVerified)
+      throw new UnauthorizedException('No autorizado');
+
+    const candidates = await this.prisma.refreshToken.findMany({
+      where: {
+        userId: user.id,
+        revokedAt: null,
+        expiresAt: { gt: new Date() },
+      },
+      orderBy: { createdAt: 'desc' },
+      take: 10,
+    });
+
+    const match = await (async () => {
+      for (const row of candidates) {
+        const ok = await bcrypt.compare(refreshToken, row.tokenHash);
+        if (ok) return row;
+      }
+      return null;
+    })();
+
+    if (!match) throw new UnauthorizedException('Refresh token inválido');
+
+    const accessToken = this.signAccessToken({
+      sub: user.id,
+      email: user.email,
+    });
+    return { accessToken };
+  }
+
+  async logout(refreshToken: string) {
+    let payload: { sub: string; email: string };
+    try {
+      payload = this.jwt.verify(refreshToken, {
+        secret: this.config.get<string>('JWT_REFRESH_SECRET'),
+      });
+    } catch {
+      return { ok: true };
+    }
+
+    await this.prisma.refreshToken.updateMany({
+      where: { userId: payload.sub, revokedAt: null },
+      data: { revokedAt: new Date() },
     });
 
     return { ok: true };

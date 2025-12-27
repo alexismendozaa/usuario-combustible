@@ -6,6 +6,8 @@ import {
   UseGuards,
   Param,
   Res,
+  HttpCode,
+  HttpStatus,
 } from '@nestjs/common';
 import type { Response } from 'express';
 import { AuthService } from './auth.service';
@@ -14,6 +16,7 @@ import { RegisterDto } from './dto/register.dto';
 import { VerifyEmailDto } from './dto/verify-email.dto';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
+import { RefreshDto } from './dto/refresh.dto';
 import { JwtAuthGuard } from './jwt-auth.guard';
 import { CurrentUser } from './current-user';
 
@@ -53,7 +56,7 @@ export class AuthController {
         <h2>Correo verificado correctamente</h2>
         <p>Ya puedes iniciar sesión en la aplicación.</p>
       `);
-    } catch (e) {
+    } catch {
       return res.status(400).send(`
         <h2>Error al verificar</h2>
         <p>El enlace es inválido o ha expirado.</p>
@@ -86,18 +89,30 @@ export class AuthController {
   @Post('reset-password/confirm/:token')
   async confirmResetPost(
     @Param('token') token: string,
-    @Body() body: any,
+    @Body('newPassword') newPassword: string,
     @Res() res: Response,
   ) {
     try {
-      await this.auth.resetPassword(token, body.newPassword);
+      await this.auth.resetPassword(token, newPassword);
       return res.send(
-        `<h2>Contraseña actualizada ✅</h2><p>Ya puedes iniciar sesión.</p>`,
+        `<h2>Contraseña actualizada</h2><p>Ya puedes iniciar sesión.</p>`,
       );
-    } catch (e) {
+    } catch {
       return res
         .status(400)
-        .send(`<h2>Error ❌</h2><p>Token inválido o expirado.</p>`);
+        .send(`<h2>Error</h2><p>Token inválido o expirado.</p>`);
     }
+  }
+
+  @Post('refresh')
+  @HttpCode(HttpStatus.OK)
+  refresh(@Body() dto: RefreshDto) {
+    return this.auth.refresh(dto.refreshToken);
+  }
+
+  @Post('logout')
+  @HttpCode(HttpStatus.OK)
+  logout(@Body() dto: RefreshDto) {
+    return this.auth.logout(dto.refreshToken);
   }
 }

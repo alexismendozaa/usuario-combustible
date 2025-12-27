@@ -41,7 +41,16 @@ Crea un archivo `.env` en la raíz del proyecto con la siguiente configuración:
 
 ```env
 DATABASE_URL="postgresql://usuario:password@localhost:5432/nombre_db?schema=public"
-JWT_SECRET="tu_secreto_jwt_aqui"
+
+# JWT (access)
+JWT_ACCESS_SECRET="tu_secreto_access"
+ACCESS_TOKEN_TTL=900          # 15 minutos en segundos
+
+# JWT (refresh)
+JWT_REFRESH_SECRET="tu_secreto_refresh"
+REFRESH_TOKEN_TTL=2592000     # 30 días en segundos
+
+# Correo
 MAIL_HOST="smtp.ejemplo.com"
 MAIL_PORT=587
 MAIL_USER="tu_email@ejemplo.com"
@@ -69,6 +78,18 @@ $ npx prisma migrate deploy
 
 # O crear una nueva migración después de cambios en schema.prisma
 $ npx prisma migrate dev --name nombre_de_tu_migracion
+```
+
+Si ves el error P3009 (migración fallida en destino), puedes rebaselinar en desarrollo:
+
+```bash
+# 1) (opcional) Habilitar pgcrypto si no existe
+psql "$DATABASE_URL" -c 'CREATE EXTENSION IF NOT EXISTS "pgcrypto";'
+
+# 2) Eliminar la migración fallida local y crear una inicial desde el schema actual
+rm -rf prisma/migrations/*
+npx prisma migrate dev --name init
+npx prisma generate
 ```
 
 ### 4. Generar Prisma Client
