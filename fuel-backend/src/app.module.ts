@@ -7,6 +7,7 @@ import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { MailModule } from './auth/mail/mail.module';
 import { VehiclesModule } from './vehicles/vehicles.module';
+import { RefuelsModule } from './refuels/refuels.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { VehiclesModule } from './vehicles/vehicles.module';
     AuthModule,
     MailModule,
     VehiclesModule,
+    RefuelsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
