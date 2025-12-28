@@ -25,6 +25,53 @@
 
 [Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
 
+## API Endpoints
+
+- **Autenticación (público salvo donde se indica)**
+  - `POST /auth/register` → `{ email, password, name? }`
+  - `POST /auth/login` → `{ email, password }` (devuelve access + refresh token).
+  - `GET /auth/me` → requiere `Authorization: Bearer <accessToken>`.
+  - `POST /auth/verify-email` → `{ token }` (token recibido por correo).
+  - `GET /auth/verify-email/confirm/:token` → confirma desde enlace público.
+  - `POST /auth/forgot-password` → `{ email }` envía correo de reseteo.
+  - `POST /auth/reset-password` → `{ token, newPassword }` usa token del correo.
+  - `GET /auth/reset-password/confirm/:token` → devuelve formulario HTML para actualizar la contraseña.
+  - `POST /auth/reset-password/confirm/:token` → `{ newPassword }` vía formulario (HTML).
+  - `POST /auth/refresh` → `{ refreshToken }` obtiene nuevo access token.
+  - `POST /auth/logout` → `{ refreshToken }` invalida refresh.
+
+- **Vehículos** (token requerido `Authorization: Bearer <accessToken>`, prefijo `/vehicles`)
+  - `POST /` crear → `{ name, brand?, model?, year?, plate?, fuelType?, odometerKm? }`
+  - `GET /` listar propios.
+  - `GET /:id` obtener detalle.
+  - `PATCH /:id` actualizar → mismos campos todos opcionales.
+  - `DELETE /:id` eliminar.
+
+- **Cargas de combustible** (token requerido, prefijo `/refuels`)
+  - `POST /` crear → `{ vehicleId, filledAt?, odometerKm, liters, totalCost, note?, lat?, lng? }`
+  - `GET /` listar, opcional `?vehicleId=`.
+  - `GET /:id` obtener.
+  - `PATCH /:id` actualizar → mismos campos opcionales.
+  - `DELETE /:id` eliminar.
+
+- **Mantenimiento** (token requerido, prefijo `/maintenance`)
+  - `POST /items` crear tarea → `{ vehicleId, title, notes?, intervalKm?, intervalMonths?, lastDoneOdometerKm?, lastDoneAt? }`
+  - `GET /items` listar, opcional `?vehicleId=`.
+  - `GET /items/:id` obtener.
+  - `PATCH /items/:id` actualizar → mismos campos opcionales.
+  - `DELETE /items/:id` eliminar.
+  - `POST /items/:id/log` marcar como realizado → `{ doneAt?, odometerKm?, cost?, note? }`.
+  - `GET /items/:id/logs` historial de logs.
+  - `GET /due` pendientes, opcional `?vehicleId=` y `?odometerKm=` (para calcular próximos).
+
+- **Reportes** (token requerido, prefijo `/reports`)
+  - `GET /vehicles/:vehicleId/summary` resumen de gastos y totales.
+  - `GET /vehicles/:vehicleId/monthly?month=YYYY-MM` métricas mensuales.
+  - `GET /vehicles/:vehicleId/timeline?limit=50` eventos ordenados (limit opcional).
+
+- **Salud**
+  - `GET /` responde string de prueba.
+
 ## Project setup
 
 ```bash

@@ -9,6 +9,7 @@ import { MailModule } from './auth/mail/mail.module';
 import { VehiclesModule } from './vehicles/vehicles.module';
 import { RefuelsModule } from './refuels/refuels.module';
 import { ReportsModule } from './reports/reports.module';
+import { MaintenanceModule } from './maintenance/maintenance.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { ReportsModule } from './reports/reports.module';
     VehiclesModule,
     RefuelsModule,
     ReportsModule,
+    MaintenanceModule,
   ],
   controllers: [AppController],
   providers: [AppService],
