@@ -8,6 +8,7 @@ import { AuthModule } from './auth/auth.module';
 import { MailModule } from './auth/mail/mail.module';
 import { VehiclesModule } from './vehicles/vehicles.module';
 import { RefuelsModule } from './refuels/refuels.module';
+import { ReportsModule } from './reports/reports.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { RefuelsModule } from './refuels/refuels.module';
     MailModule,
     VehiclesModule,
     RefuelsModule,
+    ReportsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
