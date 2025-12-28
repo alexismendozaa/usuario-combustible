@@ -10,6 +10,7 @@ import { VehiclesModule } from './vehicles/vehicles.module';
 import { RefuelsModule } from './refuels/refuels.module';
 import { ReportsModule } from './reports/reports.module';
 import { MaintenanceModule } from './maintenance/maintenance.module';
+import { StationsModule } from './stations/stations.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { MaintenanceModule } from './maintenance/maintenance.module';
     RefuelsModule,
     ReportsModule,
     MaintenanceModule,
+    StationsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
