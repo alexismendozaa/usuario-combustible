@@ -15,6 +15,8 @@ export class UsersService {
         email: data.email,
         passwordHash: data.passwordHash,
         name: data.name,
+        avatarKey: null,
+        avatarUrl: null,
       },
       select: {
         id: true,
