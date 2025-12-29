@@ -69,6 +69,20 @@
   - `GET /vehicles/:vehicleId/monthly?month=YYYY-MM` métricas mensuales.
   - `GET /vehicles/:vehicleId/timeline?limit=50` eventos ordenados (limit opcional).
 
+- **Rutas (GPS)** (token requerido, prefijo `/routes`)
+  - `POST /` crear ruta → `{ vehicleId?, name?, points: [{ lat, lng, ts(ISO) }, ...] }`
+  - `GET /` listar rutas del usuario (resumen)
+  - `GET /:id` obtener ruta completa (incluye `points`)
+  - `DELETE /:id` eliminar ruta
+
+- **Estaciones (Público)** (prefijo `/stations`)
+  - `GET /nearby?lat=<num>&lng=<num>&radius=<num?>` estaciones cercanas.
+    - Parámetros:
+      - `lat` (requerido): latitud en grados decimales. Ej: `19.4326`
+      - `lng` (requerido): longitud en grados decimales. Ej: `-99.1332`
+      - `radius` (opcional): radio en metros (200–10000). Por defecto `2000`.
+    - Respuesta (ejemplo): `{ count, stations: [{ id, name, brand?, operator?, lat, lng, address? }] }`
+
 - **Salud**
   - `GET /` responde string de prueba.
 
@@ -165,6 +179,11 @@ $ npm run start:dev
 # production mode
 $ npm run start:prod
 ```
+
+## Swagger
+
+- Documentación interactiva: http://localhost:3000/docs
+- Auth en Swagger: usa el botón "Authorize" con `Bearer <accessToken>`.
 
 ## Run tests
 
