@@ -24,6 +24,7 @@ model User {
   refuels                Refuel[]
   maintenanceItems       MaintenanceItem[]
   maintenanceLogs        MaintenanceLog[]
+  routes                 Route[]
 }
 
 model EmailVerificationToken {
@@ -82,6 +83,7 @@ model Vehicle {
   refuels Refuel[]
   maintenanceItems MaintenanceItem[]
   maintenanceLogs  MaintenanceLog[]
+  routes           Route[]
   @@index([userId])
 }
 
@@ -161,4 +163,26 @@ model MaintenanceLog {
 
   @@index([maintenanceItemId])
   @@index([vehicleId])
+}
+
+model Route {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId      String   @db.Uuid
+  vehicleId   String?  @db.Uuid
+
+  name        String?
+  startedAt   DateTime
+  endedAt     DateTime
+  durationSec Int
+  distanceKm  Decimal
+
+  points      Json
+  createdAt   DateTime @default(now())
+
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  vehicle Vehicle? @relation(fields: [vehicleId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([vehicleId])
+  @@index([startedAt])
 }
