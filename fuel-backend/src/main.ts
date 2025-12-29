@@ -5,8 +5,33 @@ import express from 'express';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {
+    bodyParser: false,
+  });
 
+  // Middleware para capturar el raw body ANTES de procesarlo
+  app.use((req, res, next) => {
+    if (req.path === '/payments/webhook') {
+      let rawBody = Buffer.alloc(0);
+      req.on('data', chunk => {
+        rawBody = Buffer.concat([rawBody, chunk]);
+      });
+      req.on('end', () => {
+        req.rawBody = rawBody;
+        next();
+      });
+    } else {
+      next();
+    }
+  });
+
+  // Middleware para webhook de Stripe (raw body)
+  app.use('/payments/webhook', express.raw({ 
+    type: ['application/json', 'application/octet-stream'],
+  }));
+  
+  // Body parser para el resto de endpoints
+  app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
 
   app.useGlobalPipes(

@@ -59,21 +59,43 @@ export class AuthService {
       name: input.name,
     });
 
+    await this.sendVerificationEmail(user.id, user.email);
+
+    return { ok: true, message: 'Revisa tu correo para verificar la cuenta.' };
+  }
+
+  async sendVerificationEmail(userId: string, email: string) {
     const secret = this.generateVerifyToken();
     const secretHash = await bcrypt.hash(secret, 10);
 
     const row = await this.prisma.emailVerificationToken.create({
       data: {
-        userId: user.id,
+        userId: userId,
         tokenHash: secretHash,
         expiresAt: this.expiresInMinutes(30),
       },
     });
 
     const verifyToken = `${row.id}.${secret}`;
-    await this.mail.sendVerificationLink(user.email, verifyToken);
+    await this.mail.sendVerificationLink(email, verifyToken);
+  }
 
-    return { ok: true, message: 'Revisa tu correo para verificar la cuenta.' };
+  async sendEmailChangeVerification(userId: string, newEmail: string, pendingId: string) {
+    const secret = this.generateVerifyToken();
+    const secretHash = await bcrypt.hash(secret, 10);
+
+    // Actualizar el token en PendingEmailChange
+    await this.prisma.pendingEmailChange.update({
+      where: { id: pendingId },
+      data: { tokenHash: secretHash },
+    });
+
+    const token = `${pendingId}.${secret}`;
+    const baseUrl =
+      this.config.get<string>('APP_PUBLIC_URL') || 'http://localhost:3000';
+    const link = `${baseUrl}/users/me/email/confirm/${token}`;
+
+    await this.mail.sendEmailChangeLink(newEmail, link);
   }
 
   async login(input: { email: string; password: string }) {

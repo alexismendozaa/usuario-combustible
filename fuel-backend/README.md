@@ -25,66 +25,172 @@
 
 [Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
 
+## 🚗 Combustible API - Sistema de Gestión de Vehículos
+
+API completa para la gestión integral de vehículos, combustible, mantenimiento y pagos. Diseñada con NestJS, PostgreSQL, Prisma y Stripe.
+
+### ✨ Características principales
+
+- 🔐 **Autenticación JWT** - Sistema completo con access/refresh tokens
+- 📧 **Verificación de Email** - Confirmación de cuenta vía correo electrónico
+- 🔑 **Recuperación de contraseña** - Flujo completo con tokens de seguridad
+- 🚙 **Gestión de Vehículos** - CRUD completo con información detallada
+- ⛽ **Registro de Combustible** - Seguimiento de cargas con ubicación GPS
+- 🔧 **Mantenimientos** - Programación y recordatorios automáticos
+- 📊 **Reportes y Analytics** - Estadísticas de consumo y gastos
+- 🗺️ **Rutas GPS** - Almacenamiento de trayectos con coordenadas
+- 🏪 **Estaciones Cercanas** - Búsqueda de gasolineras por ubicación
+- 💳 **Pagos con Stripe** - Checkout Sessions con vouchers automáticos
+- 📬 **Sistema de Emails** - Notificaciones y vouchers HTML
+- �️ **Subida de Avatares** - Almacenamiento de fotos de perfil (S3 compatible)
+- �📝 **Documentación Swagger** - API docs interactiva y completa
+
+### 🛠️ Stack Tecnológico
+
+- **Backend**: NestJS (Node.js + TypeScript)
+- **Database**: PostgreSQL + Prisma ORM
+- **Auth**: JWT (access + refresh tokens)
+- **Emails**: Nodemailer (SMTP)
+- **Pagos**: Stripe API (Checkout + Webhooks)
+- **Docs**: Swagger/OpenAPI
+- **Validation**: class-validator + class-transformer
+
+---
+
+---
+
 ## API Endpoints
 
-- **Autenticación (público salvo donde se indica)**
-  - `POST /auth/register` → `{ email, password, name? }`
-  - `POST /auth/login` → `{ email, password }` (devuelve access + refresh token).
-  - `GET /auth/me` → requiere `Authorization: Bearer <accessToken>`.
-  - `POST /auth/verify-email` → `{ token }` (token recibido por correo).
-  - `GET /auth/verify-email/confirm/:token` → confirma desde enlace público.
-  - `POST /auth/forgot-password` → `{ email }` envía correo de reseteo.
-  - `POST /auth/reset-password` → `{ token, newPassword }` usa token del correo.
-  - `GET /auth/reset-password/confirm/:token` → devuelve formulario HTML para actualizar la contraseña.
-  - `POST /auth/reset-password/confirm/:token` → `{ newPassword }` vía formulario (HTML).
-  - `POST /auth/refresh` → `{ refreshToken }` obtiene nuevo access token.
-  - `POST /auth/logout` → `{ refreshToken }` invalida refresh.
+### Autenticación (público salvo donde se indica)
+- `POST /auth/register` → `{ email, password, name? }`
+- `POST /auth/login` → `{ email, password }` (devuelve access + refresh token)
+- `GET /auth/me` → requiere `Authorization: Bearer <accessToken>`
+- `POST /auth/verify-email` → `{ token }` (token recibido por correo)
+- `GET /auth/verify-email/confirm/:token` → confirma desde enlace público
+- `POST /auth/forgot-password` → `{ email }` envía correo de reseteo
+- `POST /auth/reset-password` → `{ token, newPassword }` usa token del correo
+- `GET /auth/reset-password/confirm/:token` → devuelve formulario HTML para actualizar la contraseña
+- `POST /auth/reset-password/confirm/:token` → `{ newPassword }` vía formulario (HTML)
+- `POST /auth/refresh` → `{ refreshToken }` obtiene nuevo access token
+- `POST /auth/logout` → `{ refreshToken }` invalida refresh
 
-- **Vehículos** (token requerido `Authorization: Bearer <accessToken>`, prefijo `/vehicles`)
-  - `POST /` crear → `{ name, brand?, model?, year?, plate?, fuelType?, odometerKm? }`
-  - `GET /` listar propios.
-  - `GET /:id` obtener detalle.
-  - `PATCH /:id` actualizar → mismos campos todos opcionales.
-  - `DELETE /:id` eliminar.
+### Vehículos (requiere autenticación)
+**Prefijo**: `/vehicles`
 
-- **Cargas de combustible** (token requerido, prefijo `/refuels`)
-  - `POST /` crear → `{ vehicleId, filledAt?, odometerKm, liters, totalCost, note?, lat?, lng? }`
-  - `GET /` listar, opcional `?vehicleId=`.
-  - `GET /:id` obtener.
-  - `PATCH /:id` actualizar → mismos campos opcionales.
-  - `DELETE /:id` eliminar.
+- `POST /` crear → `{ name, brand?, model?, year?, plate?, fuelType?, odometerKm? }`
+- `GET /` listar propios
+- `GET /:id` obtener detalle
+- `PATCH /:id` actualizar → mismos campos todos opcionales
+- `DELETE /:id` eliminar
 
-- **Mantenimiento** (token requerido, prefijo `/maintenance`)
-  - `POST /items` crear tarea → `{ vehicleId, title, notes?, intervalKm?, intervalMonths?, lastDoneOdometerKm?, lastDoneAt? }`
-  - `GET /items` listar, opcional `?vehicleId=`.
-  - `GET /items/:id` obtener.
-  - `PATCH /items/:id` actualizar → mismos campos opcionales.
-  - `DELETE /items/:id` eliminar.
-  - `POST /items/:id/log` marcar como realizado → `{ doneAt?, odometerKm?, cost?, note? }`.
-  - `GET /items/:id/logs` historial de logs.
-  - `GET /due` pendientes, opcional `?vehicleId=` y `?odometerKm=` (para calcular próximos).
+### Cargas de combustible (requiere autenticación)
+**Prefijo**: `/refuels`
 
-- **Reportes** (token requerido, prefijo `/reports`)
-  - `GET /vehicles/:vehicleId/summary` resumen de gastos y totales.
-  - `GET /vehicles/:vehicleId/monthly?month=YYYY-MM` métricas mensuales.
-  - `GET /vehicles/:vehicleId/timeline?limit=50` eventos ordenados (limit opcional).
+- `POST /` crear → `{ vehicleId, filledAt?, odometerKm, liters, totalCost, note?, lat?, lng? }`
+- `GET /` listar, opcional `?vehicleId=`
+- `GET /:id` obtener
+- `PATCH /:id` actualizar → mismos campos opcionales
+- `DELETE /:id` eliminar
 
-- **Rutas (GPS)** (token requerido, prefijo `/routes`)
-  - `POST /` crear ruta → `{ vehicleId?, name?, points: [{ lat, lng, ts(ISO) }, ...] }`
-  - `GET /` listar rutas del usuario (resumen)
-  - `GET /:id` obtener ruta completa (incluye `points`)
-  - `DELETE /:id` eliminar ruta
+### Mantenimiento (requiere autenticación)
+**Prefijo**: `/maintenance`
 
-- **Estaciones (Público)** (prefijo `/stations`)
-  - `GET /nearby?lat=<num>&lng=<num>&radius=<num?>` estaciones cercanas.
-    - Parámetros:
-      - `lat` (requerido): latitud en grados decimales. Ej: `19.4326`
-      - `lng` (requerido): longitud en grados decimales. Ej: `-99.1332`
-      - `radius` (opcional): radio en metros (200–10000). Por defecto `2000`.
-    - Respuesta (ejemplo): `{ count, stations: [{ id, name, brand?, operator?, lat, lng, address? }] }`
+- `POST /items` crear tarea → `{ vehicleId, title, notes?, intervalKm?, intervalMonths?, lastDoneOdometerKm?, lastDoneAt? }`
+- `GET /items` listar, opcional `?vehicleId=`
+- `GET /items/:id` obtener
+- `PATCH /items/:id` actualizar → mismos campos opcionales
+- `DELETE /items/:id` eliminar
+- `POST /items/:id/log` marcar como realizado → `{ doneAt?, odometerKm?, cost?, note? }`
+- `GET /items/:id/logs` historial de logs
+- `GET /due` pendientes, opcional `?vehicleId=` y `?odometerKm=` (para calcular próximos)
 
-- **Salud**
-  - `GET /` responde string de prueba.
+### Reportes (requiere autenticación)
+**Prefijo**: `/reports`
+
+- `GET /vehicles/:vehicleId/summary` resumen de gastos y totales
+- `GET /vehicles/:vehicleId/monthly?month=YYYY-MM` métricas mensuales
+- `GET /vehicles/:vehicleId/timeline?limit=50` eventos ordenados (limit opcional)
+
+### Rutas (GPS) (requiere autenticación)
+**Prefijo**: `/routes`
+
+- `POST /` crear ruta → `{ vehicleId?, name?, points: [{ lat, lng, ts(ISO) }, ...] }`
+- `GET /` listar rutas del usuario (resumen)
+- `GET /:id` obtener ruta completa (incluye `points`)
+- `DELETE /:id` eliminar ruta
+
+### Estaciones (público)
+**Prefijo**: `/stations`
+
+- `GET /nearby?lat=<num>&lng=<num>&radius=<num?>` estaciones cercanas
+  - **Parámetros**:
+    - `lat` (requerido): latitud en grados decimales. Ej: `19.4326`
+    - `lng` (requerido): longitud en grados decimales. Ej: `-99.1332`
+    - `radius` (opcional): radio en metros (200–10000). Por defecto `2000`
+  - **Respuesta**: `{ count, stations: [{ id, name, brand?, operator?, lat, lng, address? }] }`
+
+### Pagos / Stripe
+**Prefijo**: `/payments`
+
+- `POST /checkout` (requiere autenticación) → crear sesión de pago
+  - **Body**: `{ amountCents: number, description?: string }`
+  - **Respuesta**: `{ paymentId: string, checkoutUrl: string }`
+  - El usuario debe visitar `checkoutUrl` para completar el pago en Stripe
+  - Al completar el pago:
+    - El webhook crea una factura en Stripe
+    - Stripe enviará automáticamente el recibo oficial por email
+    - El pago se marca como "paid" en la base de datos
+- `GET /` (requiere autenticación) → listar historial de pagos del usuario
+- `POST /webhook` (público, solo para Stripe) → webhook de eventos Stripe
+  - Verifica firma con `STRIPE_WEBHOOK_SECRET`
+  - Procesa `checkout.session.completed` para:
+    - Marcar el pago como completado en la base de datos
+    - Crear una factura en Stripe (que genera el recibo oficial)
+    - Stripe envía automáticamente el recibo por correo electrónico
+
+### Usuario (requiere autenticación)
+**Prefijo**: `/users/me`
+
+- `GET /` → obtener perfil del usuario autenticado
+  - **Respuesta**: `{ userId, email, name?, avatarUrl? }`
+- `PATCH /name` → actualizar nombre del usuario
+  - **Body**: `{ name: string }`
+  - **Respuesta**: `{ id, email, name, avatarUrl }`
+- `PATCH /email` → solicitar cambio de email
+  - **Body**: `{ newEmail: string }`
+  - **Respuesta**: `{ message: "Se ha enviado un correo de verificación a nuevo@ejemplo.com..." }`
+  - **Flujo**: 
+    1. Usuario solicita cambio con el nuevo email
+    2. Se envía un correo de verificación al NUEVO email
+    3. Usuario confirma el enlace recibido (GET automático al hacer clic)
+    4. El email se actualiza en la base de datos
+- `GET /email/confirm/:token` → confirmar cambio de email
+  - **Parámetro**: `token` (recibido en el correo de verificación)
+  - **Acceso**: Vía enlace público en el correo (no requiere autenticación)
+  - **Respuesta**: `{ id, email, name, message: "Email actualizado correctamente" }`
+- `PATCH /password` → cambiar contraseña del usuario
+  - **Body**: `{ currentPassword: string, newPassword: string }`
+  - **Respuesta**: `{ ok: true, message: "Contraseña actualizada correctamente" }`
+  - **Nota**: Requiere verificar la contraseña actual para mayor seguridad
+- `DELETE /` → eliminar cuenta del usuario
+  - **Respuesta**: `{ ok: true, message: "Cuenta eliminada correctamente" }`
+  - **Nota**: Esta acción es permanente y eliminará todos los datos asociados al usuario
+
+**Avatar**: `/users/me/avatar`
+
+- `POST /` → subir/reemplazar avatar
+  - **Content-Type**: `multipart/form-data`
+  - **Field**: `file` (imagen JPG, PNG o WebP)
+  - **Límite**: 5MB máximo
+  - **Respuesta**: `{ ok: true, user: { id, email, name?, avatarUrl } }`
+  - Las imágenes se almacenan en un servidor de archivos estático (compatible con S3)
+- `GET /` → obtener URL del avatar actual
+- `DELETE /` → eliminar avatar del usuario
+
+### Salud
+- `GET /` responde string de prueba
+
+---
 
 ## Project setup
 
@@ -111,12 +217,31 @@ ACCESS_TOKEN_TTL=900          # 15 minutos en segundos
 JWT_REFRESH_SECRET="tu_secreto_refresh"
 REFRESH_TOKEN_TTL=2592000     # 30 días en segundos
 
-# Correo
-MAIL_HOST="smtp.ejemplo.com"
-MAIL_PORT=587
-MAIL_USER="tu_email@ejemplo.com"
-MAIL_PASSWORD="tu_password"
+# Correo (SMTP)
+SMTP_HOST="smtp.ejemplo.com"
+SMTP_PORT=587
+SMTP_USER="tu_email@ejemplo.com"
+SMTP_PASS="tu_password"
+MAIL_FROM="noreply@tuapp.com"  # Opcional, usa SMTP_USER si no se define
+APP_PUBLIC_URL="http://localhost:3000"  # URL base para enlaces en emails
+
+# Stripe (Pagos)
+STRIPE_SECRET_KEY="sk_test_..."           # Clave secreta de Stripe (Test mode)
+STRIPE_WEBHOOK_SECRET="whsec_..."         # Secret del webhook (obtener de Stripe CLI o Dashboard)
+STRIPE_CURRENCY="usd"                     # Moneda por defecto (usd, mxn, eur, etc.)
+STRIPE_SUCCESS_URL="http://localhost:3000/payment/success"  # Redirección al completar pago
+STRIPE_CANCEL_URL="http://localhost:3000/payment/cancel"    # Redirección al cancelar pago
+
+# S3 / Almacenamiento de Archivos (Avatares)
+S3_PUBLIC_BASE_URL="http://localhost:3001"  # URL base del servidor de archivos (puede ser S3, Cloudflare R2, o servidor local)
+S3_UPLOAD_PREFIX="uploads/avatars"          # Prefijo para organizar archivos (opcional, default: uploads/avatars)
 ```
+
+> **Nota sobre almacenamiento**: Este proyecto usa un servidor de archivos compatible con S3 API para subir avatares. Puedes usar:
+> - **Desarrollo local**: Un servidor HTTP simple que acepte PUT/DELETE (ej: `python -m http.server 3001`)
+> - **S3**: AWS S3 con URLs pre-firmadas
+> - **Cloudflare R2**: Compatible con S3 API
+> - **MinIO**: Servidor de almacenamiento de objetos auto-hospedado
 
 ### 2. Habilitar extensión pgcrypto en PostgreSQL
 
@@ -167,6 +292,50 @@ $ npx prisma generate
 $ npx prisma studio
 ```
 
+## Stripe Setup (Pagos)
+
+Este proyecto integra Stripe para procesar pagos mediante Checkout Sessions. Sigue estos pasos para configurar Stripe:
+
+### 1. Crear cuenta en Stripe
+
+1. Regístrate en [Stripe](https://stripe.com)
+2. Activa el **modo Test** (toggle en el Dashboard)
+3. Obtén tus claves API desde [API Keys](https://dashboard.stripe.com/test/apikeys):
+   - `STRIPE_SECRET_KEY` (comienza con `sk_test_...`)
+
+### 2. Configurar Webhook Local (desarrollo)
+
+Para probar webhooks localmente, usa **Stripe CLI**:
+
+```bash
+# Instalar Stripe CLI (macOS)
+brew install stripe/stripe-cli/stripe
+
+# Autenticar
+stripe login
+
+# Escuchar webhooks y reenviarlos a tu servidor local
+stripe listen --forward-to localhost:3000/payments/webhook
+```
+
+Esto te dará un **webhook signing secret** (`whsec_...`). Cópialo y agrégalo a tu `.env` como `STRIPE_WEBHOOK_SECRET`.
+
+### 3. Probar el flujo de pago
+
+1. **Crear Checkout**: `POST /payments/checkout` con `{ amountCents: 5000, description: "Test" }`
+2. **Completar pago**: Visita el `checkoutUrl` retornado
+3. **Usar tarjeta de prueba**: `4242 4242 4242 4242` (fecha futura, cualquier CVC)
+4. **Verificar webhook**: El webhook procesará `checkout.session.completed` y:
+   - Marcará el pago como `paid` en tu DB
+   - Enviará un voucher HTML por email
+
+### 4. Webhooks en producción
+
+1. Crea un webhook endpoint en [Stripe Dashboard → Webhooks](https://dashboard.stripe.com/webhooks)
+2. URL: `https://tudominio.com/payments/webhook`
+3. Eventos: Selecciona `checkout.session.completed`
+4. Copia el **Signing Secret** y úsalo como `STRIPE_WEBHOOK_SECRET` en producción
+
 ## Compile and run the project
 
 ```bash
@@ -182,8 +351,26 @@ $ npm run start:prod
 
 ## Swagger
 
-- Documentación interactiva: http://localhost:3000/docs
-- Auth en Swagger: usa el botón "Authorize" con `Bearer <accessToken>`.
+- **Documentación interactiva**: http://localhost:3000/docs
+- **Autenticación en Swagger**: 
+  1. Regístrate/inicia sesión para obtener un `accessToken`
+  2. Haz clic en el botón **"Authorize"** (🔓 arriba a la derecha)
+  3. Ingresa: `Bearer {tu-accessToken}` (ejemplo: `Bearer eyJhbGc...`)
+  4. Haz clic en "Authorize" y luego "Close"
+  5. Ahora puedes probar todos los endpoints protegidos
+
+### Endpoints disponibles en Swagger
+
+- **Auth**: Registro, login, verificación de email, recuperación de contraseña
+- **Vehículos**: CRUD completo de vehículos
+- **Cargas de Combustible**: Registro y gestión de recargas
+- **Mantenimiento**: Programación y seguimiento de mantenimientos
+- **Reportes**: Estadísticas y análisis por vehículo
+- **Rutas**: Almacenar y consultar rutas GPS
+- **Estaciones**: Buscar estaciones de gasolina cercanas
+- **Pagos / Stripe**: Crear checkouts y ver historial de pagos
+- **Usuario**: Gestión de perfil y avatar
+- **Avatar**: Subir/eliminar foto de perfil (hasta 5MB)
 
 ## Run tests
 

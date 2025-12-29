@@ -20,11 +20,14 @@ model User {
   EmailVerificationToken EmailVerificationToken[]
   PasswordResetToken     PasswordResetToken[]
   RefreshToken           RefreshToken[]
+  PendingEmailChange     PendingEmailChange[]
   vehicles               Vehicle[]
   refuels                Refuel[]
   maintenanceItems       MaintenanceItem[]
   maintenanceLogs        MaintenanceLog[]
   routes                 Route[]
+  payments               Payment[]
+
 }
 
 model EmailVerificationToken {
@@ -38,6 +41,21 @@ model EmailVerificationToken {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
+}
+
+model PendingEmailChange {
+  id        String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId    String    @db.Uuid
+  newEmail  String
+  tokenHash String
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([newEmail])
 }
 
 model PasswordResetToken {
@@ -185,4 +203,28 @@ model Route {
   @@index([userId])
   @@index([vehicleId])
   @@index([startedAt])
+}
+
+model Payment {
+  id                 String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId             String   @db.Uuid
+
+  provider           String   @default("stripe")
+  status             String
+
+  amountCents        Int
+  currency           String   @default("usd")
+
+  stripeSessionId     String?
+  stripePaymentIntentId String?
+
+  createdAt          DateTime @default(now())
+  paidAt             DateTime?
+
+  description        String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([stripeSessionId])
 }

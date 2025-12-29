@@ -86,4 +86,41 @@ export class MailService {
       `,
     });
   }
+
+  async sendVoucherEmail(to: string, subject: string, html: string) {
+    const from =
+      this.config.get<string>('MAIL_FROM') ||
+      this.config.get<string>('SMTP_USER')!;
+    return this.transporter.sendMail({
+      from,
+      to,
+      subject,
+      html,
+    });
+  }
+
+  async sendEmailChangeLink(to: string, link: string) {
+    const from =
+      this.config.get<string>('MAIL_FROM') ||
+      this.config.get<string>('SMTP_USER')!;
+    return this.transporter.sendMail({
+      from,
+      to,
+      subject: 'Confirmar cambio de email',
+      html: `
+        <h2>Confirmación de cambio de email</h2>
+        <p>Haz clic en el siguiente botón para confirmar tu nuevo email:</p>
+        <a href="${link}" style="
+          display:inline-block;
+          padding:10px 16px;
+          background:#2563eb;
+          color:#fff;
+          text-decoration:none;
+          border-radius:6px;
+        ">Confirmar email</a>
+        <p>Este enlace expira en 30 minutos.</p>
+        <p>Si no solicitaste este cambio, ignora este correo.</p>
+      `,
+    });
+  }
 }

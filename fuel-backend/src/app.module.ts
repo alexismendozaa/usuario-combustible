@@ -12,6 +12,7 @@ import { ReportsModule } from './reports/reports.module';
 import { MaintenanceModule } from './maintenance/maintenance.module';
 import { StationsModule } from './stations/stations.module';
 import { RoutesModule } from './routes/routes.module';
+import { PaymentsModule } from './payments/payments.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { RoutesModule } from './routes/routes.module';
     MaintenanceModule,
     StationsModule,
     RoutesModule,
+    PaymentsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
