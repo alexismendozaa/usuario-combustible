@@ -1,4 +1,8 @@
-import { Injectable, BadRequestException, UnauthorizedException } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
 
@@ -101,7 +105,7 @@ export class UsersService {
     // Actualizar email Y marcar como verificado (sin requerir userId)
     const updated = await this.prisma.user.update({
       where: { id: pending.userId },
-      data: { 
+      data: {
         email: pending.newEmail,
         isVerified: true, // Marcar el nuevo email como verificado
       },
@@ -113,11 +117,16 @@ export class UsersService {
     });
 
     return {
-      message: 'Email actualizado correctamente. Por favor, inicia sesión con tu nuevo email.',
+      message:
+        'Email actualizado correctamente. Por favor, inicia sesión con tu nuevo email.',
     };
   }
 
-  async updatePassword(userId: string, currentPassword: string, newPassword: string) {
+  async updatePassword(
+    userId: string,
+    currentPassword: string,
+    newPassword: string,
+  ) {
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
     });
@@ -143,7 +152,22 @@ export class UsersService {
     return { ok: true, message: 'Contraseña actualizada correctamente' };
   }
 
-  async deleteAccount(userId: string) {
+  async deleteAccount(userId: string, password: string) {
+    // Verificar que el usuario existe
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!user) {
+      throw new BadRequestException('Usuario no encontrado');
+    }
+
+    // Verificar la contraseña
+    const valid = await bcrypt.compare(password, user.passwordHash);
+    if (!valid) {
+      throw new UnauthorizedException('Contraseña incorrecta');
+    }
+
     // Eliminar registros relacionados en cascada o marcar como eliminado
     await this.prisma.user.delete({
       where: { id: userId },
