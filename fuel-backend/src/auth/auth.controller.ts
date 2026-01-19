@@ -50,6 +50,7 @@ export class AuthController {
   }
 
   @Post('login')
+  @HttpCode(HttpStatus.OK)
   @ApiOperation({ 
     summary: 'Iniciar sesión',
     description: 'Inicia sesión con email y contraseña. Devuelve access token y refresh token.'
@@ -119,13 +120,171 @@ export class AuthController {
     try {
       await this.auth.verifyEmailWithToken(token);
       return res.send(`
-        <h2>Correo verificado correctamente</h2>
-        <p>Ya puedes iniciar sesión en la aplicación.</p>
+        <!DOCTYPE html>
+        <html lang="es">
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Correo Verificado - SmartFuel</title>
+          <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+          <style>
+            * { margin: 0; padding: 0; box-sizing: border-box; }
+            body {
+              font-family: 'Nunito', -apple-system, BlinkMacSystemFont, sans-serif;
+              background: linear-gradient(135deg, #fff5f0 0%, #ffffff 50%, #fff8f5 100%);
+              min-height: 100vh;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              padding: 20px;
+            }
+            .container {
+              background: #ffffff;
+              border-radius: 16px;
+              box-shadow: 0 10px 40px rgba(255, 77, 0, 0.1), 0 2px 10px rgba(0, 0, 0, 0.05);
+              padding: 48px 40px;
+              max-width: 420px;
+              width: 100%;
+              text-align: center;
+              border: 1.5px solid #d1d1d6;
+            }
+            .icon-container {
+              width: 80px;
+              height: 80px;
+              background: linear-gradient(135deg, #34C759 0%, #30D158 100%);
+              border-radius: 50%;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              margin: 0 auto 24px;
+              box-shadow: 0 8px 20px rgba(52, 199, 89, 0.3);
+            }
+            .icon-container svg { width: 40px; height: 40px; }
+            .title {
+              font-size: 24px;
+              font-weight: 800;
+              color: #1a1a1a;
+              margin-bottom: 12px;
+            }
+            .message {
+              font-size: 16px;
+              color: #666666;
+              line-height: 1.6;
+              margin-bottom: 32px;
+            }
+            .brand {
+              font-size: 14px;
+              color: #ff4d00;
+              font-weight: 700;
+              letter-spacing: 1px;
+            }
+            .divider {
+              height: 4px;
+              width: 60px;
+              background: linear-gradient(90deg, #ff4d00, #ff6b35);
+              border-radius: 2px;
+              margin: 0 auto 24px;
+            }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="icon-container">
+              <svg fill="none" viewBox="0 0 24 24" stroke="white" stroke-width="3">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
+            <div class="divider"></div>
+            <h1 class="title">¡Correo Verificado!</h1>
+            <p class="message">Tu cuenta ha sido verificada correctamente. Ya puedes iniciar sesión en la aplicación SmartFuel.</p>
+            <p class="brand">SMARTFUEL</p>
+          </div>
+        </body>
+        </html>
       `);
     } catch {
       return res.status(400).send(`
-        <h2>Error al verificar</h2>
-        <p>El enlace es inválido o ha expirado.</p>
+        <!DOCTYPE html>
+        <html lang="es">
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Error de Verificación - SmartFuel</title>
+          <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+          <style>
+            * { margin: 0; padding: 0; box-sizing: border-box; }
+            body {
+              font-family: 'Nunito', -apple-system, BlinkMacSystemFont, sans-serif;
+              background: linear-gradient(135deg, #fff5f0 0%, #ffffff 50%, #fff8f5 100%);
+              min-height: 100vh;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              padding: 20px;
+            }
+            .container {
+              background: #ffffff;
+              border-radius: 16px;
+              box-shadow: 0 10px 40px rgba(255, 77, 0, 0.1), 0 2px 10px rgba(0, 0, 0, 0.05);
+              padding: 48px 40px;
+              max-width: 420px;
+              width: 100%;
+              text-align: center;
+              border: 1.5px solid #d1d1d6;
+            }
+            .icon-container {
+              width: 80px;
+              height: 80px;
+              background: linear-gradient(135deg, #FF3B30 0%, #FF453A 100%);
+              border-radius: 50%;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              margin: 0 auto 24px;
+              box-shadow: 0 8px 20px rgba(255, 59, 48, 0.3);
+            }
+            .icon-container svg { width: 40px; height: 40px; }
+            .title {
+              font-size: 24px;
+              font-weight: 800;
+              color: #1a1a1a;
+              margin-bottom: 12px;
+            }
+            .message {
+              font-size: 16px;
+              color: #666666;
+              line-height: 1.6;
+              margin-bottom: 32px;
+            }
+            .brand {
+              font-size: 14px;
+              color: #ff4d00;
+              font-weight: 700;
+              letter-spacing: 1px;
+            }
+            .divider {
+              height: 4px;
+              width: 60px;
+              background: linear-gradient(90deg, #FF3B30, #FF453A);
+              border-radius: 2px;
+              margin: 0 auto 24px;
+            }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="icon-container">
+              <svg fill="none" viewBox="0 0 24 24" stroke="white" stroke-width="3">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </div>
+            <div class="divider"></div>
+            <h1 class="title">Error de Verificación</h1>
+            <p class="message">El enlace es inválido o ha expirado. Por favor, solicita un nuevo enlace de verificación desde la aplicación.</p>
+            <p class="brand">SMARTFUEL</p>
+          </div>
+        </body>
+        </html>
       `);
     }
   }
@@ -168,12 +327,147 @@ export class AuthController {
   @Get('reset-password/confirm/:token')
   confirmReset(@Param('token') token: string, @Res() res: Response) {
     return res.send(`
-      <h2>Restablecer contraseña</h2>
-      <form method="POST" action="/auth/reset-password/confirm/${token}">
-        <label>Nueva contraseña:</label><br/>
-        <input type="password" name="newPassword" minlength="8" required /><br/><br/>
-        <button type="submit">Cambiar contraseña</button>
-      </form>
+      <!DOCTYPE html>
+      <html lang="es">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Restablecer Contraseña - SmartFuel</title>
+        <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+        <style>
+          * { margin: 0; padding: 0; box-sizing: border-box; }
+          body {
+            font-family: 'Nunito', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #fff5f0 0%, #ffffff 50%, #fff8f5 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+          }
+          .container {
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(255, 77, 0, 0.1), 0 2px 10px rgba(0, 0, 0, 0.05);
+            padding: 48px 40px;
+            max-width: 420px;
+            width: 100%;
+            text-align: center;
+            border: 1.5px solid #d1d1d6;
+          }
+          .icon-container {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #ff4d00 0%, #ff6b35 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 24px;
+            box-shadow: 0 8px 20px rgba(255, 77, 0, 0.3);
+          }
+          .icon-container svg { width: 40px; height: 40px; }
+          .title {
+            font-size: 24px;
+            font-weight: 800;
+            color: #1a1a1a;
+            margin-bottom: 12px;
+          }
+          .subtitle {
+            font-size: 16px;
+            color: #666666;
+            line-height: 1.6;
+            margin-bottom: 32px;
+          }
+          .divider {
+            height: 4px;
+            width: 60px;
+            background: linear-gradient(90deg, #ff4d00, #ff6b35);
+            border-radius: 2px;
+            margin: 0 auto 24px;
+          }
+          form { text-align: left; }
+          .form-group { margin-bottom: 20px; }
+          label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 8px;
+          }
+          input[type="password"] {
+            width: 100%;
+            padding: 14px 16px;
+            font-size: 16px;
+            font-family: 'Nunito', sans-serif;
+            border: 1.5px solid #d1d1d6;
+            border-radius: 12px;
+            background: #ffffff;
+            color: #1a1a1a;
+            transition: border-color 0.2s, box-shadow 0.2s;
+          }
+          input[type="password"]:focus {
+            outline: none;
+            border-color: #ff4d00;
+            box-shadow: 0 0 0 3px rgba(255, 77, 0, 0.1);
+          }
+          input[type="password"]::placeholder { color: #999999; }
+          .btn {
+            width: 100%;
+            padding: 16px;
+            font-size: 16px;
+            font-weight: 800;
+            font-family: 'Nunito', sans-serif;
+            color: #ffffff;
+            background: linear-gradient(135deg, #ff4d00 0%, #ff6b35 100%);
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 15px rgba(255, 77, 0, 0.3);
+            letter-spacing: 0.5px;
+          }
+          .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 77, 0, 0.4);
+          }
+          .btn:active { transform: translateY(0); }
+          .hint {
+            font-size: 12px;
+            color: #8E8E93;
+            margin-top: 6px;
+          }
+          .brand {
+            font-size: 14px;
+            color: #ff4d00;
+            font-weight: 700;
+            letter-spacing: 1px;
+            margin-top: 32px;
+          }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="icon-container">
+            <svg fill="none" viewBox="0 0 24 24" stroke="white" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+            </svg>
+          </div>
+          <div class="divider"></div>
+          <h1 class="title">Nueva Contraseña</h1>
+          <p class="subtitle">Ingresa tu nueva contraseña para recuperar el acceso a tu cuenta.</p>
+          <form method="POST" action="/auth/reset-password/confirm/${token}">
+            <div class="form-group">
+              <label for="newPassword">Nueva contraseña</label>
+              <input type="password" id="newPassword" name="newPassword" minlength="8" required placeholder="Mínimo 8 caracteres" />
+              <p class="hint">Usa al menos 8 caracteres</p>
+            </div>
+            <button type="submit" class="btn">CAMBIAR CONTRASEÑA</button>
+          </form>
+          <p class="brand">SMARTFUEL</p>
+        </div>
+      </body>
+      </html>
     `);
   }
 
@@ -185,13 +479,173 @@ export class AuthController {
   ) {
     try {
       await this.auth.resetPassword(token, newPassword);
-      return res.send(
-        `<h2>Contraseña actualizada</h2><p>Ya puedes iniciar sesión.</p>`,
-      );
+      return res.send(`
+        <!DOCTYPE html>
+        <html lang="es">
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Contraseña Actualizada - SmartFuel</title>
+          <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+          <style>
+            * { margin: 0; padding: 0; box-sizing: border-box; }
+            body {
+              font-family: 'Nunito', -apple-system, BlinkMacSystemFont, sans-serif;
+              background: linear-gradient(135deg, #fff5f0 0%, #ffffff 50%, #fff8f5 100%);
+              min-height: 100vh;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              padding: 20px;
+            }
+            .container {
+              background: #ffffff;
+              border-radius: 16px;
+              box-shadow: 0 10px 40px rgba(255, 77, 0, 0.1), 0 2px 10px rgba(0, 0, 0, 0.05);
+              padding: 48px 40px;
+              max-width: 420px;
+              width: 100%;
+              text-align: center;
+              border: 1.5px solid #d1d1d6;
+            }
+            .icon-container {
+              width: 80px;
+              height: 80px;
+              background: linear-gradient(135deg, #34C759 0%, #30D158 100%);
+              border-radius: 50%;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              margin: 0 auto 24px;
+              box-shadow: 0 8px 20px rgba(52, 199, 89, 0.3);
+            }
+            .icon-container svg { width: 40px; height: 40px; }
+            .title {
+              font-size: 24px;
+              font-weight: 800;
+              color: #1a1a1a;
+              margin-bottom: 12px;
+            }
+            .message {
+              font-size: 16px;
+              color: #666666;
+              line-height: 1.6;
+              margin-bottom: 32px;
+            }
+            .brand {
+              font-size: 14px;
+              color: #ff4d00;
+              font-weight: 700;
+              letter-spacing: 1px;
+            }
+            .divider {
+              height: 4px;
+              width: 60px;
+              background: linear-gradient(90deg, #34C759, #30D158);
+              border-radius: 2px;
+              margin: 0 auto 24px;
+            }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="icon-container">
+              <svg fill="none" viewBox="0 0 24 24" stroke="white" stroke-width="3">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
+            <div class="divider"></div>
+            <h1 class="title">¡Contraseña Actualizada!</h1>
+            <p class="message">Tu contraseña ha sido cambiada correctamente. Ya puedes iniciar sesión en la aplicación SmartFuel con tu nueva contraseña.</p>
+            <p class="brand">SMARTFUEL</p>
+          </div>
+        </body>
+        </html>
+      `);
     } catch {
-      return res
-        .status(400)
-        .send(`<h2>Error</h2><p>Token inválido o expirado.</p>`);
+      return res.status(400).send(`
+        <!DOCTYPE html>
+        <html lang="es">
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Error - SmartFuel</title>
+          <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+          <style>
+            * { margin: 0; padding: 0; box-sizing: border-box; }
+            body {
+              font-family: 'Nunito', -apple-system, BlinkMacSystemFont, sans-serif;
+              background: linear-gradient(135deg, #fff5f0 0%, #ffffff 50%, #fff8f5 100%);
+              min-height: 100vh;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              padding: 20px;
+            }
+            .container {
+              background: #ffffff;
+              border-radius: 16px;
+              box-shadow: 0 10px 40px rgba(255, 77, 0, 0.1), 0 2px 10px rgba(0, 0, 0, 0.05);
+              padding: 48px 40px;
+              max-width: 420px;
+              width: 100%;
+              text-align: center;
+              border: 1.5px solid #d1d1d6;
+            }
+            .icon-container {
+              width: 80px;
+              height: 80px;
+              background: linear-gradient(135deg, #FF3B30 0%, #FF453A 100%);
+              border-radius: 50%;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              margin: 0 auto 24px;
+              box-shadow: 0 8px 20px rgba(255, 59, 48, 0.3);
+            }
+            .icon-container svg { width: 40px; height: 40px; }
+            .title {
+              font-size: 24px;
+              font-weight: 800;
+              color: #1a1a1a;
+              margin-bottom: 12px;
+            }
+            .message {
+              font-size: 16px;
+              color: #666666;
+              line-height: 1.6;
+              margin-bottom: 32px;
+            }
+            .brand {
+              font-size: 14px;
+              color: #ff4d00;
+              font-weight: 700;
+              letter-spacing: 1px;
+            }
+            .divider {
+              height: 4px;
+              width: 60px;
+              background: linear-gradient(90deg, #FF3B30, #FF453A);
+              border-radius: 2px;
+              margin: 0 auto 24px;
+            }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="icon-container">
+              <svg fill="none" viewBox="0 0 24 24" stroke="white" stroke-width="3">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </div>
+            <div class="divider"></div>
+            <h1 class="title">Error</h1>
+            <p class="message">El enlace es inválido o ha expirado. Por favor, solicita un nuevo enlace de recuperación de contraseña desde la aplicación.</p>
+            <p class="brand">SMARTFUEL</p>
+          </div>
+        </body>
+        </html>
+      `);
     }
   }
 

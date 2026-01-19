@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   Injectable,
+  NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
@@ -47,16 +48,20 @@ export class AuthService {
     return randomBytes(32).toString('hex');
   }
 
-  async register(input: { email: string; password: string; name?: string }) {
+  async register(input: { email: string; password: string; name: string }) {
     const existing = await this.users.findByEmail(input.email);
     if (existing) throw new BadRequestException('Email ya registrado');
+
+    if (!input.name || !input.name.trim()) {
+      throw new BadRequestException('El nombre es requerido');
+    }
 
     const passwordHash = await bcrypt.hash(input.password, 10);
 
     const user = await this.users.create({
       email: input.email,
       passwordHash,
-      name: input.name,
+      name: input.name.trim(),
     });
 
     await this.sendVerificationEmail(user.id, user.email);
@@ -100,15 +105,17 @@ export class AuthService {
 
   async login(input: { email: string; password: string }) {
     const user = await this.users.findByEmail(input.email);
-    if (!user) throw new UnauthorizedException('Credenciales inválidas');
+    if (!user) {
+      throw new UnauthorizedException('No existe una cuenta con este correo');
+    }
 
     const ok = await bcrypt.compare(input.password, user.passwordHash);
-    if (!ok) throw new UnauthorizedException('Credenciales inválidas');
+    if (!ok) {
+      throw new UnauthorizedException('Contraseña incorrecta');
+    }
 
     if (!user.isVerified) {
-      throw new UnauthorizedException(
-        'Debes verificar tu correo antes de iniciar sesión',
-      );
+      throw new UnauthorizedException('Debes verificar tu correo antes de iniciar sesión');
     }
 
     const accessToken = this.signAccessToken({
@@ -131,7 +138,7 @@ export class AuthService {
     });
 
     return {
-      user: { id: user.id, email: user.email, name: user.name },
+      user: { id: user.id, email: user.email, name: user.name, avatarUrl: user.avatarUrl },
       accessToken,
       refreshToken,
     };
