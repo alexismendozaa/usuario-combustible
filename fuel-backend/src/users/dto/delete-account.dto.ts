@@ -1,12 +1,13 @@
-import { IsString, MinLength } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+import { IsString, MinLength } from 'class-validator';
 
 export class DeleteAccountDto {
   @ApiProperty({
-    description: 'Contraseña actual del usuario para verificar identidad',
-    example: 'MiContraseñaSegura123',
+    description: 'Contraseña actual del usuario para confirmar la eliminación',
+    example: 'miPassword123',
+    minLength: 8,
   })
   @IsString()
-  @MinLength(1, { message: 'La contraseña es requerida' })
+  @MinLength(8)
   password: string;
 }
