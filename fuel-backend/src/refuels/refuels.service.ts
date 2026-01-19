@@ -35,6 +35,7 @@ export class RefuelsService {
         odometerKm: dto.odometerKm,
         liters: dto.liters as any,
         totalCost: dto.totalCost as any,
+        paymentMethod: dto.paymentMethod || 'cash',
         note: dto.note,
         lat: dto.lat as any,
         lng: dto.lng as any,

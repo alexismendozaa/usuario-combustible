@@ -4,6 +4,7 @@ import {
   IsNumber,
   IsOptional,
   IsString,
+  IsIn,
   Min,
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
@@ -51,6 +52,17 @@ export class CreateRefuelDto {
   @IsNumber()
   @Min(0)
   totalCost!: number;
+
+  @ApiProperty({ 
+    example: 'cash',
+    description: 'Método de pago: cash (efectivo) o stripe (tarjeta)',
+    enum: ['cash', 'stripe'],
+    default: 'cash'
+  })
+  @IsOptional()
+  @IsString()
+  @IsIn(['cash', 'stripe'])
+  paymentMethod?: string;
 
   @ApiProperty({ 
     example: 'Estación Shell, centro',
