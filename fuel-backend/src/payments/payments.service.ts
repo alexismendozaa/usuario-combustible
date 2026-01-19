@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import Stripe from 'stripe';
 import { PrismaService } from '../../prisma/prisma.service';
@@ -175,6 +175,45 @@ export class PaymentsService {
       where: { userId },
       orderBy: { createdAt: 'desc' },
     });
+  }
+
+  async getStatus(userId: string, paymentId: string) {
+    const payment = await this.prisma.payment.findFirst({
+      where: { id: paymentId, userId },
+      select: { id: true, status: true, paidAt: true, stripeSessionId: true },
+    });
+
+    if (!payment) {
+      throw new NotFoundException('Pago no encontrado');
+    }
+
+    // Si ya está marcado como pagado, retornar directamente
+    if (payment.status === 'paid') {
+      return { id: payment.id, status: 'paid', paidAt: payment.paidAt };
+    }
+
+    // Si está pending y tiene sessionId, verificar en Stripe si fue completado
+    if (payment.status === 'pending' && payment.stripeSessionId) {
+      try {
+        console.log('[PAYMENT STATUS] Verificando sesión en Stripe:', payment.stripeSessionId);
+        const session = await this.stripe.checkout.sessions.retrieve(payment.stripeSessionId);
+        
+        if (session.payment_status === 'paid') {
+          // Marcar como pagado en la BD
+          console.log('[PAYMENT STATUS] Sesión fue pagada. Actualizando BD...');
+          await this.markPaidBySession(
+            payment.stripeSessionId,
+            session.payment_intent as string | null
+          );
+          return { id: payment.id, status: 'paid', paidAt: new Date().toISOString() };
+        }
+      } catch (err) {
+        console.error('[PAYMENT STATUS] Error verificando sesión:', (err as Error).message);
+        // Continuar retornando el estado pending si hay error
+      }
+    }
+
+    return { id: payment.id, status: payment.status, paidAt: payment.paidAt };
   }
 
   async getReceiptUrl(userId: string, paymentId: string) {

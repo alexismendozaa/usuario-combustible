@@ -74,6 +74,23 @@ export class PaymentsController {
 
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
+  @Get(':id/status')
+  @ApiOperation({
+    summary: 'Obtener estado de un pago',
+    description: 'Verifica el estado actual de un pago específico (pending, paid, cancelled, etc.)'
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Estado del pago',
+    example: { id: 'a1b2c3d4...', status: 'paid', paidAt: '2025-12-29T18:30:00.000Z' }
+  })
+  @ApiResponse({ status: 404, description: 'Pago no encontrado' })
+  getStatus(@CurrentUser() u: { userId: string }, @Param('id') id: string) {
+    return this.payments.getStatus(u.userId, id);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @Get(':id/receipt')
   @ApiOperation({
     summary: 'Obtener URL de recibo oficial',
