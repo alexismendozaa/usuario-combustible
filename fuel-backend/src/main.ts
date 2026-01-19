@@ -3,11 +3,23 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import express from 'express';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     bodyParser: false,
   });
+
+  // Habilitar CORS para permitir peticiones desde el frontend
+  app.enableCors({
+    origin: true, // Permite todos los orígenes en desarrollo
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+  });
+
+  // Registrar el filtro de excepciones global
+  app.useGlobalFilters(new HttpExceptionFilter());
 
   // Middleware para capturar el raw body ANTES de procesarlo
   app.use((req, res, next) => {
@@ -88,6 +100,10 @@ Todos los endpoints tienen ejemplos de request/response. Solo copia, modifica lo
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('docs', app, document);
 
-  await app.listen(process.env.PORT || 3000);
+  // Escuchar en 0.0.0.0 para aceptar conexiones de cualquier interfaz (incluyendo desde dispositivos en la red)
+  const port = process.env.PORT || 3000;
+  await app.listen(port, '0.0.0.0');
+  console.log(` Servidor ejecutándose en http://0.0.0.0:${port}`);
+  console.log(`Accede desde dispositivos en la red usando http://192.168.0.102:${port}`);
 }
 void bootstrap();
