@@ -106,8 +106,8 @@ export class RoutesService {
     });
   }
 
-  list(userId: string) {
-    return this.prisma.route.findMany({
+  async list(userId: string) {
+    const routes = await this.prisma.route.findMany({
       where: { userId },
       orderBy: { startedAt: 'desc' },
       select: {
@@ -121,13 +121,22 @@ export class RoutesService {
         createdAt: true,
       },
     });
+    
+    return routes.map(route => ({
+      ...route,
+      distanceKm: Number(route.distanceKm),
+    }));
   }
 
   async get(userId: string, id: string) {
     const route = await this.prisma.route.findUnique({ where: { id } });
     if (!route) throw new NotFoundException('Ruta no encontrada');
     if (route.userId !== userId) throw new ForbiddenException();
-    return route; // incluye points
+    
+    return {
+      ...route,
+      distanceKm: Number(route.distanceKm),
+    };
   }
 
   async remove(userId: string, id: string) {
