@@ -85,7 +85,11 @@ export class AuthService {
     await this.mail.sendVerificationLink(email, verifyToken);
   }
 
-  async sendEmailChangeVerification(userId: string, newEmail: string, pendingId: string) {
+  async sendEmailChangeVerification(
+    userId: string,
+    newEmail: string,
+    pendingId: string,
+  ) {
     const secret = this.generateVerifyToken();
     const secretHash = await bcrypt.hash(secret, 10);
 
@@ -97,7 +101,7 @@ export class AuthService {
 
     const token = `${pendingId}.${secret}`;
     const baseUrl =
-      this.config.get<string>('APP_PUBLIC_URL') || 'http://localhost:3000';
+      this.config.get<string>('APP_PUBLIC_URL') || 'http://52.202.69.85:3000';
     const link = `${baseUrl}/users/me/email/confirm/${token}`;
 
     await this.mail.sendEmailChangeLink(newEmail, link);
@@ -115,7 +119,9 @@ export class AuthService {
     }
 
     if (!user.isVerified) {
-      throw new UnauthorizedException('Debes verificar tu correo antes de iniciar sesión');
+      throw new UnauthorizedException(
+        'Debes verificar tu correo antes de iniciar sesión',
+      );
     }
 
     const accessToken = this.signAccessToken({
@@ -138,7 +144,12 @@ export class AuthService {
     });
 
     return {
-      user: { id: user.id, email: user.email, name: user.name, avatarUrl: user.avatarUrl },
+      user: {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        avatarUrl: user.avatarUrl,
+      },
       accessToken,
       refreshToken,
     };
@@ -152,9 +163,18 @@ export class AuthService {
 
     const row = await this.prisma.emailVerificationToken.findUnique({
       where: { id },
+      include: { user: true },
     });
     if (!row) throw new BadRequestException('Token inválido');
-    if (row.usedAt) throw new BadRequestException('Token ya usado');
+    
+    // Si el token ya fue usado, verificar si el usuario ya está verificado
+    if (row.usedAt) {
+      if (row.user?.isVerified) {
+        return { ok: true, alreadyVerified: true };
+      }
+      throw new BadRequestException('Token ya usado');
+    }
+    
     if (row.expiresAt <= new Date())
       throw new BadRequestException('Token expirado');
 
