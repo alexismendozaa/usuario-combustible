@@ -14,7 +14,14 @@ import { CurrentUser } from '../auth/current-user';
 import { RefuelsService } from './refuels.service';
 import { CreateRefuelDto } from './dto/create-refuel.dto';
 import { UpdateRefuelDto } from './dto/update-refuel.dto';
-import { ApiBearerAuth, ApiTags, ApiOperation, ApiResponse, ApiParam, ApiQuery } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiParam,
+  ApiQuery,
+} from '@nestjs/swagger';
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
@@ -24,12 +31,12 @@ export class RefuelsController {
   constructor(private readonly refuels: RefuelsService) {}
 
   @Post()
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Registrar carga de combustible',
-    description: 'Registra una nueva carga de combustible para un vehículo.'
+    description: 'Registra una nueva carga de combustible para un vehículo.',
   })
-  @ApiResponse({ 
-    status: 201, 
+  @ApiResponse({
+    status: 201,
     description: 'Carga registrada',
     example: {
       ok: true,
@@ -39,13 +46,13 @@ export class RefuelsController {
         filledAt: '2025-12-28T10:30:00.000Z',
         odometerKm: 51234,
         liters: 45.5,
-        totalCost: 850.50,
+        totalCost: 850.5,
         pricePerLiter: 18.69,
         note: 'Estación Shell, centro',
         lat: 19.4326,
-        lng: -99.1332
-      }
-    }
+        lng: -99.1332,
+      },
+    },
   })
   @ApiResponse({ status: 401, description: 'No autenticado' })
   @ApiResponse({ status: 404, description: 'Vehículo no encontrado' })
@@ -54,13 +61,19 @@ export class RefuelsController {
   }
 
   @Get()
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Listar cargas de combustible',
-    description: 'Obtiene todas las cargas del usuario. Opcionalmente filtrar por vehículo.'
+    description:
+      'Obtiene todas las cargas del usuario. Opcionalmente filtrar por vehículo.',
   })
-  @ApiQuery({ name: 'vehicleId', required: false, description: 'ID del vehículo para filtrar', example: 'af56dcb6-35a3-4b27-a24f-d0a6fa8e4082' })
-  @ApiResponse({ 
-    status: 200, 
+  @ApiQuery({
+    name: 'vehicleId',
+    required: false,
+    description: 'ID del vehículo para filtrar',
+    example: 'af56dcb6-35a3-4b27-a24f-d0a6fa8e4082',
+  })
+  @ApiResponse({
+    status: 200,
     description: 'Lista de cargas',
     example: {
       ok: true,
@@ -71,11 +84,11 @@ export class RefuelsController {
           filledAt: '2025-12-28T10:30:00.000Z',
           odometerKm: 51234,
           liters: 45.5,
-          totalCost: 850.50,
-          pricePerLiter: 18.69
-        }
-      ]
-    }
+          totalCost: 850.5,
+          pricePerLiter: 18.69,
+        },
+      ],
+    },
   })
   @ApiResponse({ status: 401, description: 'No autenticado' })
   list(
@@ -86,13 +99,17 @@ export class RefuelsController {
   }
 
   @Get(':id')
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Obtener carga de combustible',
-    description: 'Obtiene los detalles de una carga específica.'
+    description: 'Obtiene los detalles de una carga específica.',
   })
-  @ApiParam({ name: 'id', description: 'ID de la carga', example: 'cm5h8k9l0000208l5abc123def' })
-  @ApiResponse({ 
-    status: 200, 
+  @ApiParam({
+    name: 'id',
+    description: 'ID de la carga',
+    example: 'cm5h8k9l0000208l5abc123def',
+  })
+  @ApiResponse({
+    status: 200,
     description: 'Carga obtenida',
     example: {
       ok: true,
@@ -102,10 +119,10 @@ export class RefuelsController {
         filledAt: '2025-12-28T10:30:00.000Z',
         odometerKm: 51234,
         liters: 45.5,
-        totalCost: 850.50,
-        note: 'Estación Shell'
-      }
-    }
+        totalCost: 850.5,
+        note: 'Estación Shell',
+      },
+    },
   })
   @ApiResponse({ status: 401, description: 'No autenticado' })
   @ApiResponse({ status: 404, description: 'Carga no encontrada' })
@@ -114,22 +131,26 @@ export class RefuelsController {
   }
 
   @Patch(':id')
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Actualizar carga de combustible',
-    description: 'Actualiza los datos de una carga.'
+    description: 'Actualiza los datos de una carga.',
   })
-  @ApiParam({ name: 'id', description: 'ID de la carga', example: 'cm5h8k9l0000208l5abc123def' })
-  @ApiResponse({ 
-    status: 200, 
+  @ApiParam({
+    name: 'id',
+    description: 'ID de la carga',
+    example: 'cm5h8k9l0000208l5abc123def',
+  })
+  @ApiResponse({
+    status: 200,
     description: 'Carga actualizada',
     example: {
       ok: true,
       refuel: {
         id: 'cm5h8k9l0000208l5abc123def',
         liters: 46.0,
-        totalCost: 860.00
-      }
-    }
+        totalCost: 860.0,
+      },
+    },
   })
   @ApiResponse({ status: 401, description: 'No autenticado' })
   @ApiResponse({ status: 404, description: 'Carga no encontrada' })
@@ -142,18 +163,22 @@ export class RefuelsController {
   }
 
   @Delete(':id')
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Eliminar carga de combustible',
-    description: 'Elimina una carga de combustible.'
+    description: 'Elimina una carga de combustible.',
   })
-  @ApiParam({ name: 'id', description: 'ID de la carga', example: 'cm5h8k9l0000208l5abc123def' })
-  @ApiResponse({ 
-    status: 200, 
+  @ApiParam({
+    name: 'id',
+    description: 'ID de la carga',
+    example: 'cm5h8k9l0000208l5abc123def',
+  })
+  @ApiResponse({
+    status: 200,
     description: 'Carga eliminada',
     example: {
       ok: true,
-      message: 'Carga eliminada'
-    }
+      message: 'Carga eliminada',
+    },
   })
   @ApiResponse({ status: 401, description: 'No autenticado' })
   @ApiResponse({ status: 404, description: 'Carga no encontrada' })
