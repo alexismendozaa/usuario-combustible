@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Param, Post, Req, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
 import type { Request } from 'express';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { CurrentUser } from '../auth/current-user';
@@ -6,7 +14,12 @@ import { PaymentsService } from './payments.service';
 import { CreateCheckoutDto } from './dto/create-checkout.dto';
 import { ConfigService } from '@nestjs/config';
 import Stripe from 'stripe';
-import { ApiBearerAuth, ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+} from '@nestjs/swagger';
 
 @ApiTags('Pagos / Stripe')
 @Controller('payments')
@@ -24,33 +37,45 @@ export class PaymentsController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @Post('checkout')
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Crear Checkout de Stripe',
-    description: 'Crea una sesión de pago en Stripe Checkout. Devuelve un URL donde el usuario puede completar el pago. Al completar el pago, se enviará un recibo por email.'
+    description:
+      'Crea una sesión de pago en Stripe Checkout. Devuelve un URL donde el usuario puede completar el pago. Al completar el pago, se enviará un recibo por email.',
   })
-  @ApiResponse({ 
-    status: 201, 
+  @ApiResponse({
+    status: 201,
     description: 'Checkout creado exitosamente',
     example: {
       paymentId: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
-      checkoutUrl: 'https://checkout.stripe.com/c/pay/cs_test_a1b2c3d4...'
-    }
+      checkoutUrl: 'https://checkout.stripe.com/c/pay/cs_test_a1b2c3d4...',
+    },
   })
   @ApiResponse({ status: 401, description: 'No autenticado' })
-  @ApiResponse({ status: 400, description: 'Datos inválidos o URLs no configuradas' })
-  checkout(@CurrentUser() u: { userId: string }, @Body() dto: CreateCheckoutDto) {
-    return this.payments.createCheckout(u.userId, dto.amountCents, dto.description);
+  @ApiResponse({
+    status: 400,
+    description: 'Datos inválidos o URLs no configuradas',
+  })
+  checkout(
+    @CurrentUser() u: { userId: string },
+    @Body() dto: CreateCheckoutDto,
+  ) {
+    return this.payments.createCheckout(
+      u.userId,
+      dto.amountCents,
+      dto.description,
+    );
   }
 
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @Get()
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Listar pagos del usuario',
-    description: 'Obtiene el historial de pagos del usuario autenticado, ordenados por fecha de creación (más reciente primero).'
+    description:
+      'Obtiene el historial de pagos del usuario autenticado, ordenados por fecha de creación (más reciente primero).',
   })
-  @ApiResponse({ 
-    status: 200, 
+  @ApiResponse({
+    status: 200,
     description: 'Lista de pagos',
     example: [
       {
@@ -63,9 +88,9 @@ export class PaymentsController {
         stripeSessionId: 'cs_test_a1b2c3d4...',
         stripePaymentIntentId: 'pi_3abc123...',
         paidAt: '2025-12-29T18:30:00.000Z',
-        createdAt: '2025-12-29T18:25:00.000Z'
-      }
-    ]
+        createdAt: '2025-12-29T18:25:00.000Z',
+      },
+    ],
   })
   @ApiResponse({ status: 401, description: 'No autenticado' })
   list(@CurrentUser() u: { userId: string }) {
@@ -77,12 +102,17 @@ export class PaymentsController {
   @Get(':id/status')
   @ApiOperation({
     summary: 'Obtener estado de un pago',
-    description: 'Verifica el estado actual de un pago específico (pending, paid, cancelled, etc.)'
+    description:
+      'Verifica el estado actual de un pago específico (pending, paid, cancelled, etc.)',
   })
   @ApiResponse({
     status: 200,
     description: 'Estado del pago',
-    example: { id: 'a1b2c3d4...', status: 'paid', paidAt: '2025-12-29T18:30:00.000Z' }
+    example: {
+      id: 'a1b2c3d4...',
+      status: 'paid',
+      paidAt: '2025-12-29T18:30:00.000Z',
+    },
   })
   @ApiResponse({ status: 404, description: 'Pago no encontrado' })
   getStatus(@CurrentUser() u: { userId: string }, @Param('id') id: string) {
@@ -94,12 +124,13 @@ export class PaymentsController {
   @Get(':id/receipt')
   @ApiOperation({
     summary: 'Obtener URL de recibo oficial',
-    description: 'Devuelve el receipt_url oficial generado por Stripe para el pago indicado.'
+    description:
+      'Devuelve el receipt_url oficial generado por Stripe para el pago indicado.',
   })
   @ApiResponse({
     status: 200,
     description: 'URL de recibo recuperada',
-    example: { receiptUrl: 'https://pay.stripe.com/receipts/payment/CAca...' }
+    example: { receiptUrl: 'https://pay.stripe.com/receipts/payment/CAca...' },
   })
   @ApiResponse({ status: 404, description: 'Pago no encontrado' })
   @ApiResponse({ status: 400, description: 'No hay recibo disponible' })
@@ -116,13 +147,18 @@ export class PaymentsController {
     console.log('[WEBHOOK] Recibido');
     console.log('[WEBHOOK] Headers:', JSON.stringify(req.headers, null, 2));
     console.log('[WEBHOOK] Signature header:', sig ? 'presente' : 'ausente');
-    console.log('[WEBHOOK] Secret configurado:', whsec ? 'presente' : 'ausente');
+    console.log(
+      '[WEBHOOK] Secret configurado:',
+      whsec ? 'presente' : 'ausente',
+    );
     console.log('[WEBHOOK] rawBody:', req.rawBody ? 'presente' : 'ausente');
     console.log('[WEBHOOK] Body type:', typeof req.body);
 
     if (!sig || !whsec) {
       console.log('[WEBHOOK] ERROR: Sin firma o secret no configurado');
-      console.log('[WEBHOOK] Verifica que stripe listen esté corriendo y conectado');
+      console.log(
+        '[WEBHOOK] Verifica que stripe listen esté corriendo y conectado',
+      );
       return { ok: false };
     }
 
@@ -139,7 +175,7 @@ export class PaymentsController {
       } else {
         body = JSON.stringify(req.body);
       }
-      
+
       console.log('[WEBHOOK] Verificando firma con Stripe...');
       event = this.stripe.webhooks.constructEvent(body, sig, whsec);
     } catch (err) {
@@ -151,14 +187,14 @@ export class PaymentsController {
 
     // Evento clave para Checkout: checkout.session.completed
     if (event.type === 'checkout.session.completed') {
-      const session = event.data.object as Stripe.Checkout.Session;
+      const session = event.data.object;
       console.log('[WEBHOOK] Procesando pago completado. Session:', session.id);
 
       // Solo marcar como pagado; Stripe enviará recibo oficial si
       // en Dashboard está habilitado "Email customers for successful payments"
       await this.payments.markPaidBySession(
         session.id,
-        session.payment_intent as string | null
+        session.payment_intent as string | null,
       );
 
       console.log('[WEBHOOK] Pago marcado como completado');
