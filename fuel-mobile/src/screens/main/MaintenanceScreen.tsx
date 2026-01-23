@@ -27,7 +27,7 @@ import { LoadingSpinner } from '../../components/common/LoadingSpinner';
 import { Button } from '../../components/common/Button';
 import { Input } from '../../components/common/Input';
 import { Picker, PickerOption } from '../../components/common/Picker';
-import { MAINTENANCE_TYPES } from '../../types/index';
+import { MAINTENANCE_TYPES, getMaintenanceLabel } from '../../types/index';
 import BottomNavigation from '../../components/common/BottomNavigation';
 
 export default function MaintenanceScreen() {
@@ -211,7 +211,7 @@ export default function MaintenanceScreen() {
             <View style={styles.itemCard}>
               <View style={styles.itemHeader}>
                 <View style={styles.itemTitleSection}>
-                  <Text style={styles.itemTitle}>{item.title}</Text>
+                  <Text style={styles.itemTitle}>{getMaintenanceLabel(item.title)}</Text>
                   <Text style={styles.vehicleName}>
                     {vehicle?.name || 'Vehículo desconocido'}
                   </Text>

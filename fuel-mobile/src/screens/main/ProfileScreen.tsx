@@ -152,8 +152,15 @@ export default function ProfileScreen() {
           await refreshUser();
           Alert.alert('Éxito', 'Avatar actualizado correctamente');
         } catch (error: any) {
-          const message = error?.response?.data?.message || 'No se pudo subir el avatar';
-          Alert.alert('Error', message);
+          // Mostrar información de depuración
+          let debugMsg = `URI: ${asset.uri}\n`;
+          if (error?.response?.data?.message) {
+            debugMsg += `\nBackend: ${error.response.data.message}`;
+          }
+          if (error?.message) {
+            debugMsg += `\nError: ${error.message}`;
+          }
+          Alert.alert('Error al subir avatar', debugMsg || 'No se pudo subir el avatar');
         } finally {
           setLoading(false);
         }

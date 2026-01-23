@@ -135,11 +135,20 @@ export default function StationsScreen() {
             title={station.name}
             description={station.address || ''}
             onPress={() => setSelectedStation(station)}
-            pinColor="#FF9500"
+            tracksViewChanges={Platform.OS === 'android'}
+            anchor={{ x: 0.5, y: 0.5 }}
           >
-            <View style={styles.customMarker}>
-              <MaterialCommunityIcons name="gas-station" size={28} color="#FFFFFF" />
-            </View>
+            {Platform.OS === 'ios' ? (
+              <View style={styles.markerContainer}>
+                <View style={styles.customMarker}>
+                  <MaterialCommunityIcons name="gas-station" size={20} color="#FFFFFF" />
+                </View>
+              </View>
+            ) : (
+              <View style={styles.androidMarker}>
+                <MaterialCommunityIcons name="gas-station" size={18} color="#FFFFFF" />
+              </View>
+            )}
           </Marker>
         ))}
       </MapView>
@@ -299,9 +308,9 @@ const styles = StyleSheet.create({
     display: 'none',
   },
   customMarker: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
     backgroundColor: '#FF9500',
     justifyContent: 'center',
     alignItems: 'center',
@@ -311,6 +320,22 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.3,
     shadowRadius: 3,
-    elevation: 5,
+  },
+  markerContainer: {
+    width: 50,
+    height: 50,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  // Marcador simplificado para Android sin sombras ni bordes problemáticos
+  androidMarker: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: '#FF9500',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: '#FFFFFF',
   },
 });

@@ -3,7 +3,12 @@
  * Maneja actualización de perfil, avatar, etc.
  */
 
+
 import apiClient from './apiClient';
+import { Platform } from 'react-native';
+import * as LegacyFileSystem from 'expo-file-system/legacy';
+import { API_BASE_URL, STORAGE_KEYS } from '../../config/constants';
+import { getSecureValue } from './secureStorageHelper';
 
 export interface UpdateNameData {
   name: string;
@@ -62,34 +67,56 @@ class UserService {
   }
 
   /**
-   * Subir avatar
+   * Subir avatar usando FileSystem.uploadAsync (compatible con iOS y Android en Expo Go)
    */
   async uploadAvatar(uri: string): Promise<{ ok: boolean; user: UserProfile }> {
-    // Crear FormData para multipart/form-data
-    const formData = new FormData();
-    
-    // Obtener nombre del archivo desde la URI
+    // Determinar el nombre del archivo y tipo MIME
     const filename = uri.split('/').pop() || 'avatar.jpg';
     const match = /\.(\w+)$/.exec(filename);
-    const type = match ? `image/${match[1]}` : 'image/jpeg';
+    const extension = match ? match[1].toLowerCase() : 'jpg';
+    const mimeType = extension === 'png' ? 'image/png' : 
+                     extension === 'gif' ? 'image/gif' : 
+                     extension === 'webp' ? 'image/webp' : 'image/jpeg';
 
-    formData.append('file', {
-      uri,
-      name: filename,
-      type,
-    } as any);
+    // Obtener el token de autenticación
+    const token = await getSecureValue(STORAGE_KEYS.ACCESS_TOKEN);
 
-    const response = await apiClient.post<{ ok: boolean; user: UserProfile }>(
-      '/users/me/avatar',
-      formData,
-      {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
+    try {
+      // Usar uploadAsync que funciona en Expo Go
+      const uploadResult = await LegacyFileSystem.uploadAsync(
+        `${API_BASE_URL}/users/me/avatar`,
+        uri,
+        {
+          httpMethod: 'POST',
+          uploadType: LegacyFileSystem.FileSystemUploadType.MULTIPART,
+          fieldName: 'file',
+          mimeType: mimeType,
+          headers: {
+            Authorization: token ? `Bearer ${token}` : '',
+          },
+        }
+      );
+
+      console.log('Upload result status:', uploadResult.status);
+      console.log('Upload result body:', uploadResult.body);
+
+      if (uploadResult.status >= 200 && uploadResult.status < 300) {
+        const responseData = JSON.parse(uploadResult.body);
+        return responseData;
+      } else {
+        let errorMessage = 'Error al subir avatar';
+        try {
+          const errorData = JSON.parse(uploadResult.body);
+          errorMessage = errorData.message || errorMessage;
+        } catch {
+          // Ignorar errores de parseo
+        }
+        throw new Error(errorMessage);
       }
-    );
-
-    return response.data;
+    } catch (error: any) {
+      console.error('Error en uploadAvatar:', error);
+      throw error;
+    }
   }
 
   /**

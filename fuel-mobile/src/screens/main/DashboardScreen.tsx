@@ -25,7 +25,7 @@ import { refuelService, Refuel } from '../../services/api/refuelService';
 import { reportService, VehicleSummary, MonthlyMetrics } from '../../services/api/reportService';
 import { maintenanceService, MaintenanceItem } from '../../services/api/maintenanceService';
 import { LoadingSpinner } from '../../components/common/LoadingSpinner';
-import { VEHICLE_TYPES } from '../../types/index';
+import { VEHICLE_TYPES, getMaintenanceLabel } from '../../types/index';
 
 const screenWidth = Dimensions.get('window').width;
 
@@ -414,7 +414,7 @@ export default function DashboardScreen() {
                     />
                   </View>
                   <View style={styles.alertContent}>
-                    <Text style={styles.alertTitle}>{maintenance.title}</Text>
+                    <Text style={styles.alertTitle}>{getMaintenanceLabel(maintenance.title)}</Text>
                     {maintenance.intervalKm && (
                       <Text style={styles.alertSubtitle}>
                         Cada {maintenance.intervalKm} km
