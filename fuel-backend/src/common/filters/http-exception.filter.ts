@@ -15,7 +15,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
     const exceptionResponse = exception.getResponse();
 
     let message = 'Error en el servidor';
-    
+
     // Extraer el mensaje de la excepción
     if (typeof exceptionResponse === 'object' && exceptionResponse !== null) {
       const resp = exceptionResponse as any;
