@@ -25,7 +25,7 @@ async function bootstrap() {
   app.use((req, res, next) => {
     if (req.path === '/payments/webhook') {
       let rawBody = Buffer.alloc(0);
-      req.on('data', chunk => {
+      req.on('data', (chunk) => {
         rawBody = Buffer.concat([rawBody, chunk]);
       });
       req.on('end', () => {
@@ -38,10 +38,13 @@ async function bootstrap() {
   });
 
   // Middleware para webhook de Stripe (raw body)
-  app.use('/payments/webhook', express.raw({ 
-    type: ['application/json', 'application/octet-stream'],
-  }));
-  
+  app.use(
+    '/payments/webhook',
+    express.raw({
+      type: ['application/json', 'application/octet-stream'],
+    }),
+  );
+
   // Body parser para el resto de endpoints
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
@@ -56,7 +59,8 @@ async function bootstrap() {
 
   const config = new DocumentBuilder()
     .setTitle('Combustible API')
-    .setDescription(`
+    .setDescription(
+      `
 ## API de Gestión de Vehículos y Combustible
 
 Esta API permite gestionar vehículos, registrar cargas de combustible, programar mantenimientos y generar reportes.
@@ -86,7 +90,8 @@ La mayoría de los endpoints requieren autenticación mediante Bearer Token (JWT
 
 ### Ejemplos
 Todos los endpoints tienen ejemplos de request/response. Solo copia, modifica los IDs y envía.
-    `)
+    `,
+    )
     .setVersion('1.0')
     .addBearerAuth({
       type: 'http',
@@ -103,7 +108,7 @@ Todos los endpoints tienen ejemplos de request/response. Solo copia, modifica lo
   // Escuchar en 0.0.0.0 para aceptar conexiones de cualquier interfaz (incluyendo desde dispositivos en la red)
   const port = process.env.PORT || 3000;
   await app.listen(port, '0.0.0.0');
-  console.log(` Servidor ejecutándose en http://0.0.0.0:${port}`);
-  console.log(`Accede desde dispositivos en la red usando http://192.168.0.102:${port}`);
+  console.log(`🚀 Servidor ejecutándose en http://localhost:${port}`);
+  console.log(`📚 Documentación Swagger: http://localhost:${port}/docs`);
 }
 void bootstrap();

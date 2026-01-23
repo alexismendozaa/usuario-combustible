@@ -1,10 +1,25 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { CurrentUser } from '../auth/current-user';
 import { VehiclesService } from './vehicles.service';
 import { CreateVehicleDto } from './dto/create-vehicle.dto';
 import { UpdateVehicleDto } from './dto/update-vehicle.dto';
-import { ApiBearerAuth, ApiTags, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiParam,
+} from '@nestjs/swagger';
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
@@ -14,12 +29,12 @@ export class VehiclesController {
   constructor(private readonly vehicles: VehiclesService) {}
 
   @Post()
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Crear vehículo',
-    description: 'Crea un nuevo vehículo para el usuario autenticado.'
+    description: 'Crea un nuevo vehículo para el usuario autenticado.',
   })
-  @ApiResponse({ 
-    status: 201, 
+  @ApiResponse({
+    status: 201,
     description: 'Vehículo creado',
     example: {
       ok: true,
@@ -33,25 +48,22 @@ export class VehiclesController {
         fuelType: 'Gasolina',
         odometerKm: 50000,
         userId: '123e4567-e89b-12d3-a456-426614174000',
-        createdAt: '2025-12-28T10:00:00.000Z'
-      }
-    }
+        createdAt: '2025-12-28T10:00:00.000Z',
+      },
+    },
   })
   @ApiResponse({ status: 401, description: 'No autenticado' })
-  create(
-    @CurrentUser() u: { userId: string },
-    @Body() dto: CreateVehicleDto,
-  ) {
+  create(@CurrentUser() u: { userId: string }, @Body() dto: CreateVehicleDto) {
     return this.vehicles.create(u.userId, dto);
   }
 
   @Get()
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Listar vehículos',
-    description: 'Obtiene todos los vehículos del usuario autenticado.'
+    description: 'Obtiene todos los vehículos del usuario autenticado.',
   })
-  @ApiResponse({ 
-    status: 200, 
+  @ApiResponse({
+    status: 200,
     description: 'Lista de vehículos',
     example: {
       ok: true,
@@ -63,10 +75,10 @@ export class VehiclesController {
           model: 'Civic',
           year: 2020,
           plate: 'ABC-123',
-          odometerKm: 50000
-        }
-      ]
-    }
+          odometerKm: 50000,
+        },
+      ],
+    },
   })
   @ApiResponse({ status: 401, description: 'No autenticado' })
   list(@CurrentUser() u: { userId: string }) {
@@ -74,13 +86,17 @@ export class VehiclesController {
   }
 
   @Get(':id')
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Obtener vehículo',
-    description: 'Obtiene un vehículo específico del usuario.'
+    description: 'Obtiene un vehículo específico del usuario.',
   })
-  @ApiParam({ name: 'id', description: 'ID del vehículo', example: 'cm5h8k9l0000108l5abc123def' })
-  @ApiResponse({ 
-    status: 200, 
+  @ApiParam({
+    name: 'id',
+    description: 'ID del vehículo',
+    example: 'cm5h8k9l0000108l5abc123def',
+  })
+  @ApiResponse({
+    status: 200,
     description: 'Vehículo obtenido',
     example: {
       ok: true,
@@ -92,9 +108,9 @@ export class VehiclesController {
         year: 2020,
         plate: 'ABC-123',
         fuelType: 'Gasolina',
-        odometerKm: 50000
-      }
-    }
+        odometerKm: 50000,
+      },
+    },
   })
   @ApiResponse({ status: 401, description: 'No autenticado' })
   @ApiResponse({ status: 404, description: 'Vehículo no encontrado' })
@@ -103,22 +119,26 @@ export class VehiclesController {
   }
 
   @Patch(':id')
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Actualizar vehículo',
-    description: 'Actualiza los datos de un vehículo.'
+    description: 'Actualiza los datos de un vehículo.',
   })
-  @ApiParam({ name: 'id', description: 'ID del vehículo', example: 'cm5h8k9l0000108l5abc123def' })
-  @ApiResponse({ 
-    status: 200, 
+  @ApiParam({
+    name: 'id',
+    description: 'ID del vehículo',
+    example: 'cm5h8k9l0000108l5abc123def',
+  })
+  @ApiResponse({
+    status: 200,
     description: 'Vehículo actualizado',
     example: {
       ok: true,
       vehicle: {
         id: 'cm5h8k9l0000108l5abc123def',
         name: 'Mi Honda Civic 2020',
-        odometerKm: 51000
-      }
-    }
+        odometerKm: 51000,
+      },
+    },
   })
   @ApiResponse({ status: 401, description: 'No autenticado' })
   @ApiResponse({ status: 404, description: 'Vehículo no encontrado' })
@@ -131,18 +151,22 @@ export class VehiclesController {
   }
 
   @Delete(':id')
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Eliminar vehículo',
-    description: 'Elimina un vehículo y todos sus registros asociados.'
+    description: 'Elimina un vehículo y todos sus registros asociados.',
   })
-  @ApiParam({ name: 'id', description: 'ID del vehículo', example: 'cm5h8k9l0000108l5abc123def' })
-  @ApiResponse({ 
-    status: 200, 
+  @ApiParam({
+    name: 'id',
+    description: 'ID del vehículo',
+    example: 'cm5h8k9l0000108l5abc123def',
+  })
+  @ApiResponse({
+    status: 200,
     description: 'Vehículo eliminado',
     example: {
       ok: true,
-      message: 'Vehículo eliminado'
-    }
+      message: 'Vehículo eliminado',
+    },
   })
   @ApiResponse({ status: 401, description: 'No autenticado' })
   @ApiResponse({ status: 404, description: 'Vehículo no encontrado' })
