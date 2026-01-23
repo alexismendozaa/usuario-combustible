@@ -1,4 +1,9 @@
-import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { CreateMaintenanceItemDto } from './dto/create-maintenance-item.dto';
 import { UpdateMaintenanceItemDto } from './dto/update-maintenance-item.dto';
@@ -15,7 +20,9 @@ export class MaintenanceService {
   constructor(private readonly prisma: PrismaService) {}
 
   private async ensureVehicleOwner(userId: string, vehicleId: string) {
-    const v = await this.prisma.vehicle.findUnique({ where: { id: vehicleId } });
+    const v = await this.prisma.vehicle.findUnique({
+      where: { id: vehicleId },
+    });
     if (!v) throw new NotFoundException('Vehicle no encontrado');
     if (v.userId !== userId) throw new ForbiddenException();
     return v;
@@ -44,7 +51,9 @@ export class MaintenanceService {
     await this.ensureVehicleOwner(userId, dto.vehicleId);
 
     if (!dto.intervalKm && !dto.intervalMonths) {
-      throw new BadRequestException('Debes definir intervalKm o intervalMonths');
+      throw new BadRequestException(
+        'Debes definir intervalKm o intervalMonths',
+      );
     }
 
     const lastDoneAt = dto.lastDoneAt ? new Date(dto.lastDoneAt) : null;
@@ -84,7 +93,9 @@ export class MaintenanceService {
   }
 
   async get(userId: string, id: string) {
-    const item = await this.prisma.maintenanceItem.findUnique({ where: { id } });
+    const item = await this.prisma.maintenanceItem.findUnique({
+      where: { id },
+    });
     if (!item) throw new NotFoundException('Mantenimiento no encontrado');
     if (item.userId !== userId) throw new ForbiddenException();
     return item;
@@ -98,15 +109,25 @@ export class MaintenanceService {
       await this.ensureVehicleOwner(userId, dto.vehicleId);
     }
 
-    const lastDoneAt = dto.lastDoneAt ? new Date(dto.lastDoneAt) : existing.lastDoneAt;
+    const lastDoneAt = dto.lastDoneAt
+      ? new Date(dto.lastDoneAt)
+      : existing.lastDoneAt;
     const lastDoneOdometerKm =
-      dto.lastDoneOdometerKm !== undefined ? dto.lastDoneOdometerKm : existing.lastDoneOdometerKm;
+      dto.lastDoneOdometerKm !== undefined
+        ? dto.lastDoneOdometerKm
+        : existing.lastDoneOdometerKm;
 
-    const intervalKm = dto.intervalKm !== undefined ? dto.intervalKm : existing.intervalKm;
-    const intervalMonths = dto.intervalMonths !== undefined ? dto.intervalMonths : existing.intervalMonths;
+    const intervalKm =
+      dto.intervalKm !== undefined ? dto.intervalKm : existing.intervalKm;
+    const intervalMonths =
+      dto.intervalMonths !== undefined
+        ? dto.intervalMonths
+        : existing.intervalMonths;
 
     if (!intervalKm && !intervalMonths) {
-      throw new BadRequestException('Debes definir intervalKm o intervalMonths');
+      throw new BadRequestException(
+        'Debes definir intervalKm o intervalMonths',
+      );
     }
 
     const { nextDueAt, nextDueOdometerKm } = this.computeNext({
@@ -162,7 +183,7 @@ export class MaintenanceService {
     // actualizar item: lastDone y recalcular next
     const lastDoneAt = doneAt;
     const lastDoneOdometerKm =
-      odometerKm !== null ? odometerKm : item.lastDoneOdometerKm ?? null;
+      odometerKm !== null ? odometerKm : (item.lastDoneOdometerKm ?? null);
 
     const { nextDueAt, nextDueOdometerKm } = this.computeNext({
       intervalKm: item.intervalKm ?? null,
