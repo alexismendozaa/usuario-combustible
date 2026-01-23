@@ -35,7 +35,7 @@ export class MailService {
       this.config.get<string>('MAIL_FROM') ||
       this.config.get<string>('SMTP_USER')!;
     const baseUrl =
-      this.config.get<string>('APP_PUBLIC_URL') || 'http://localhost:3000';
+      this.config.get<string>('APP_PUBLIC_URL') || 'http://52.202.69.85:3000';
     const link = `${baseUrl}/auth/verify-email/confirm/${token}`;
 
     await this.transporter.sendMail({
@@ -63,7 +63,7 @@ export class MailService {
       this.config.get<string>('MAIL_FROM') ||
       this.config.get<string>('SMTP_USER')!;
     const baseUrl =
-      this.config.get<string>('APP_PUBLIC_URL') || 'http://localhost:3000';
+      this.config.get<string>('APP_PUBLIC_URL') || 'http://52.202.69.85:3000';
     const link = `${baseUrl}/auth/reset-password/confirm/${token}`;
 
     await this.transporter.sendMail({

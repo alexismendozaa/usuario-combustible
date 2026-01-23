@@ -9,7 +9,12 @@ import {
   HttpCode,
   HttpStatus,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+} from '@nestjs/swagger';
 import type { Response } from 'express';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
@@ -27,12 +32,13 @@ export class AuthController {
   constructor(private readonly auth: AuthService) {}
 
   @Post('register')
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Registrar nuevo usuario',
-    description: 'Crea una nueva cuenta de usuario. Se enviará un correo de verificación.'
+    description:
+      'Crea una nueva cuenta de usuario. Se enviará un correo de verificación.',
   })
-  @ApiResponse({ 
-    status: 201, 
+  @ApiResponse({
+    status: 201,
     description: 'Usuario registrado exitosamente',
     example: {
       ok: true,
@@ -40,23 +46,27 @@ export class AuthController {
       user: {
         id: 'cm5h8k9l0000108l5abc123def',
         email: 'usuario@ejemplo.com',
-        name: 'Juan Pérez'
-      }
-    }
+        name: 'Juan Pérez',
+      },
+    },
   })
-  @ApiResponse({ status: 400, description: 'Email ya registrado o datos inválidos' })
+  @ApiResponse({
+    status: 400,
+    description: 'Email ya registrado o datos inválidos',
+  })
   register(@Body() dto: RegisterDto) {
     return this.auth.register(dto);
   }
 
   @Post('login')
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Iniciar sesión',
-    description: 'Inicia sesión con email y contraseña. Devuelve access token y refresh token.'
+    description:
+      'Inicia sesión con email y contraseña. Devuelve access token y refresh token.',
   })
-  @ApiResponse({ 
-    status: 200, 
+  @ApiResponse({
+    status: 200,
     description: 'Login exitoso',
     example: {
       ok: true,
@@ -65,11 +75,14 @@ export class AuthController {
       user: {
         id: 'cm5h8k9l0000108l5abc123def',
         email: 'usuario@ejemplo.com',
-        name: 'Juan Pérez'
-      }
-    }
+        name: 'Juan Pérez',
+      },
+    },
   })
-  @ApiResponse({ status: 401, description: 'Credenciales inválidas o email no verificado' })
+  @ApiResponse({
+    status: 401,
+    description: 'Credenciales inválidas o email no verificado',
+  })
   login(@Body() dto: LoginDto) {
     return this.auth.login(dto);
   }
@@ -77,17 +90,18 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @Get('me')
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Obtener usuario actual',
-    description: 'Requiere autenticación. Devuelve información del usuario autenticado.'
+    description:
+      'Requiere autenticación. Devuelve información del usuario autenticado.',
   })
-  @ApiResponse({ 
-    status: 200, 
+  @ApiResponse({
+    status: 200,
     description: 'Usuario obtenido',
     example: {
       userId: 'af56dcb6-35a3-4b27-a24f-d0a6fa8e4082',
-      email: 'usuario@ejemplo.com'
-    }
+      email: 'usuario@ejemplo.com',
+    },
   })
   @ApiResponse({ status: 401, description: 'No autenticado' })
   me(@CurrentUser() user: { userId: string; email: string }) {
@@ -95,17 +109,18 @@ export class AuthController {
   }
 
   @Post('verify-email')
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Verificar email con token',
-    description: 'Verifica el email del usuario usando el token enviado por correo.'
+    description:
+      'Verifica el email del usuario usando el token enviado por correo.',
   })
-  @ApiResponse({ 
-    status: 200, 
+  @ApiResponse({
+    status: 200,
     description: 'Email verificado',
     example: {
       ok: true,
-      message: 'Correo verificado correctamente'
-    }
+      message: 'Correo verificado correctamente',
+    },
   })
   @ApiResponse({ status: 400, description: 'Token inválido o expirado' })
   verifyEmail(@Body() dto: VerifyEmailDto) {
@@ -290,34 +305,37 @@ export class AuthController {
   }
 
   @Post('forgot-password')
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Solicitar restablecimiento de contraseña',
-    description: 'Envía un correo con un enlace para restablecer la contraseña.'
+    description:
+      'Envía un correo con un enlace para restablecer la contraseña.',
   })
-  @ApiResponse({ 
-    status: 200, 
+  @ApiResponse({
+    status: 200,
     description: 'Correo enviado',
     example: {
       ok: true,
-      message: 'Si el correo existe, recibirás instrucciones para restablecer tu contraseña.'
-    }
+      message:
+        'Si el correo existe, recibirás instrucciones para restablecer tu contraseña.',
+    },
   })
   forgot(@Body() dto: ForgotPasswordDto) {
     return this.auth.forgotPassword(dto.email);
   }
 
   @Post('reset-password')
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Restablecer contraseña',
-    description: 'Restablece la contraseña usando el token recibido por correo.'
+    description:
+      'Restablece la contraseña usando el token recibido por correo.',
   })
-  @ApiResponse({ 
-    status: 200, 
+  @ApiResponse({
+    status: 200,
     description: 'Contraseña actualizada',
     example: {
       ok: true,
-      message: 'Contraseña actualizada correctamente'
-    }
+      message: 'Contraseña actualizada correctamente',
+    },
   })
   @ApiResponse({ status: 400, description: 'Token inválido o expirado' })
   reset(@Body() dto: ResetPasswordDto) {
@@ -651,37 +669,40 @@ export class AuthController {
 
   @Post('refresh')
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Renovar access token',
-    description: 'Obtiene un nuevo access token usando el refresh token.'
+    description: 'Obtiene un nuevo access token usando el refresh token.',
   })
-  @ApiResponse({ 
-    status: 200, 
+  @ApiResponse({
+    status: 200,
     description: 'Token renovado',
     example: {
       ok: true,
       accessToken: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
-      refreshToken: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'
-    }
+      refreshToken: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
+    },
   })
-  @ApiResponse({ status: 401, description: 'Refresh token inválido o expirado' })
+  @ApiResponse({
+    status: 401,
+    description: 'Refresh token inválido o expirado',
+  })
   refresh(@Body() dto: RefreshDto) {
     return this.auth.refresh(dto.refreshToken);
   }
 
   @Post('logout')
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Cerrar sesión',
-    description: 'Invalida el refresh token.'
+    description: 'Invalida el refresh token.',
   })
-  @ApiResponse({ 
-    status: 200, 
+  @ApiResponse({
+    status: 200,
     description: 'Sesión cerrada',
     example: {
       ok: true,
-      message: 'Logout exitoso'
-    }
+      message: 'Logout exitoso',
+    },
   })
   logout(@Body() dto: RefreshDto) {
     return this.auth.logout(dto.refreshToken);
