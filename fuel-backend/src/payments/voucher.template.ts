@@ -8,7 +8,10 @@ export function buildVoucherHtml(input: {
   email?: string | null;
 }) {
   const amount = (input.amountCents / 100).toFixed(2);
-  const date = input.paidAt.toISOString().replace('T', ' ').replace('.000Z', ' UTC');
+  const date = input.paidAt
+    .toISOString()
+    .replace('T', ' ')
+    .replace('.000Z', ' UTC');
 
   return `
   <div style="font-family: Arial, sans-serif; max-width: 640px; margin: 0 auto; padding: 16px;">

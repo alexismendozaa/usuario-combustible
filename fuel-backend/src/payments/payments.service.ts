@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import Stripe from 'stripe';
 import { PrismaService } from '../../prisma/prisma.service';
@@ -19,7 +23,11 @@ export class PaymentsService {
     this.stripe = new Stripe(key, { apiVersion: '2025-12-15.clover' });
   }
 
-  async createCheckout(userId: string, amountCents: number, description?: string) {
+  async createCheckout(
+    userId: string,
+    amountCents: number,
+    description?: string,
+  ) {
     const currency = this.config.get<string>('STRIPE_CURRENCY') || 'usd';
     const successUrl = this.config.get<string>('STRIPE_SUCCESS_URL');
     const cancelUrl = this.config.get<string>('STRIPE_CANCEL_URL');
@@ -83,10 +91,14 @@ export class PaymentsService {
           },
         },
       ],
-
     });
 
-    console.log('[CHECKOUT] Sesión creada:', session.id, 'Customer:', customer.id);
+    console.log(
+      '[CHECKOUT] Sesión creada:',
+      session.id,
+      'Customer:',
+      customer.id,
+    );
 
     // 4) Guardamos sessionId
     await this.prisma.payment.update({
@@ -100,8 +112,13 @@ export class PaymentsService {
     };
   }
 
-  async markPaidBySession(stripeSessionId: string, paymentIntentId?: string | null) {
-    const p = await this.prisma.payment.findFirst({ where: { stripeSessionId } });
+  async markPaidBySession(
+    stripeSessionId: string,
+    paymentIntentId?: string | null,
+  ) {
+    const p = await this.prisma.payment.findFirst({
+      where: { stripeSessionId },
+    });
     if (!p) return;
 
     if (p.status !== 'paid') {
@@ -116,45 +133,58 @@ export class PaymentsService {
 
       // Enviar voucher por email (custom) y, si existe, incluir el recibo oficial
       try {
-        const user = await this.prisma.user.findUnique({ where: { id: updated.userId } });
+        const user = await this.prisma.user.findUnique({
+          where: { id: updated.userId },
+        });
         if (user?.email) {
           let receiptUrl: string | null = null;
           const pi = paymentIntentId ?? updated.stripePaymentIntentId ?? null;
           if (pi) {
-            const charges = await this.stripe.charges.list({ payment_intent: pi, limit: 1 });
+            const charges = await this.stripe.charges.list({
+              payment_intent: pi,
+              limit: 1,
+            });
             receiptUrl = charges.data[0]?.receipt_url ?? null;
           }
 
-          const html = buildVoucherHtml({
-            paymentId: updated.id,
-            amountCents: updated.amountCents,
-            currency: updated.currency,
-            description: updated.description,
-            paidAt: updated.paidAt!,
-            stripeSessionId: updated.stripeSessionId,
-            email: user.email,
-          }) + (receiptUrl ? `
+          const html =
+            buildVoucherHtml({
+              paymentId: updated.id,
+              amountCents: updated.amountCents,
+              currency: updated.currency,
+              description: updated.description,
+              paidAt: updated.paidAt!,
+              stripeSessionId: updated.stripeSessionId,
+              email: user.email,
+            }) +
+            (receiptUrl
+              ? `
             <p style="margin-top:12px;">
               Recibo oficial de Stripe: 
               <a href="${receiptUrl}" target="_blank">ver recibo</a>
             </p>
-          ` : '');
+          `
+              : '');
 
-          await this.mail.sendVoucherEmail(
-            user.email,
-            'Voucher de pago',
-            html,
-          );
+          await this.mail.sendVoucherEmail(user.email, 'Voucher de pago', html);
         }
       } catch (err) {
         // No romper el flujo si falla el correo
-        console.warn('[PAYMENTS] Error enviando voucher:', (err as Error).message);
+        console.warn(
+          '[PAYMENTS] Error enviando voucher:',
+          (err as Error).message,
+        );
       }
     }
   }
 
-  async markPaidAndGet(paymentSessionId: string, paymentIntentId?: string | null) {
-    const p = await this.prisma.payment.findFirst({ where: { stripeSessionId: paymentSessionId } });
+  async markPaidAndGet(
+    paymentSessionId: string,
+    paymentIntentId?: string | null,
+  ) {
+    const p = await this.prisma.payment.findFirst({
+      where: { stripeSessionId: paymentSessionId },
+    });
     if (!p) return null;
 
     const updated = await this.prisma.payment.update({
@@ -166,7 +196,9 @@ export class PaymentsService {
       },
     });
 
-    const user = await this.prisma.user.findUnique({ where: { id: updated.userId } });
+    const user = await this.prisma.user.findUnique({
+      where: { id: updated.userId },
+    });
     return { payment: updated, user };
   }
 
@@ -195,20 +227,32 @@ export class PaymentsService {
     // Si está pending y tiene sessionId, verificar en Stripe si fue completado
     if (payment.status === 'pending' && payment.stripeSessionId) {
       try {
-        console.log('[PAYMENT STATUS] Verificando sesión en Stripe:', payment.stripeSessionId);
-        const session = await this.stripe.checkout.sessions.retrieve(payment.stripeSessionId);
-        
+        console.log(
+          '[PAYMENT STATUS] Verificando sesión en Stripe:',
+          payment.stripeSessionId,
+        );
+        const session = await this.stripe.checkout.sessions.retrieve(
+          payment.stripeSessionId,
+        );
+
         if (session.payment_status === 'paid') {
           // Marcar como pagado en la BD
           console.log('[PAYMENT STATUS] Sesión fue pagada. Actualizando BD...');
           await this.markPaidBySession(
             payment.stripeSessionId,
-            session.payment_intent as string | null
+            session.payment_intent as string | null,
           );
-          return { id: payment.id, status: 'paid', paidAt: new Date().toISOString() };
+          return {
+            id: payment.id,
+            status: 'paid',
+            paidAt: new Date().toISOString(),
+          };
         }
       } catch (err) {
-        console.error('[PAYMENT STATUS] Error verificando sesión:', (err as Error).message);
+        console.error(
+          '[PAYMENT STATUS] Error verificando sesión:',
+          (err as Error).message,
+        );
         // Continuar retornando el estado pending si hay error
       }
     }
@@ -233,7 +277,9 @@ export class PaymentsService {
         throw new BadRequestException('PaymentIntent no disponible aún');
       }
 
-      const session = await this.stripe.checkout.sessions.retrieve(payment.stripeSessionId);
+      const session = await this.stripe.checkout.sessions.retrieve(
+        payment.stripeSessionId,
+      );
       const pi = (session.payment_intent as string | null) ?? null;
       if (!pi) {
         throw new BadRequestException('PaymentIntent no disponible');
@@ -248,7 +294,10 @@ export class PaymentsService {
     }
 
     // Obtenemos el cargo asociado al PaymentIntent y leemos el receipt_url
-    const charges = await this.stripe.charges.list({ payment_intent: intentId!, limit: 1 });
+    const charges = await this.stripe.charges.list({
+      payment_intent: intentId,
+      limit: 1,
+    });
     const charge = charges.data[0];
     const receiptUrl = charge?.receipt_url ?? null;
 
