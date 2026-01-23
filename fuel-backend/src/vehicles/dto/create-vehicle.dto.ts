@@ -1,40 +1,47 @@
-import { IsInt, IsOptional, IsString, Max, Min, MinLength } from 'class-validator';
+import {
+  IsInt,
+  IsOptional,
+  IsString,
+  Max,
+  Min,
+  MinLength,
+} from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateVehicleDto {
-  @ApiProperty({ 
+  @ApiProperty({
     example: 'Mi Honda Civic',
     description: 'Nombre del vehículo',
-    minLength: 2
+    minLength: 2,
   })
   @IsString()
   @MinLength(2)
   name!: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     example: 'Honda',
     description: 'Marca del vehículo',
-    required: false
+    required: false,
   })
   @IsOptional()
   @IsString()
   brand?: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     example: 'Civic',
     description: 'Modelo del vehículo',
-    required: false
+    required: false,
   })
   @IsOptional()
   @IsString()
   model?: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     example: 2020,
     description: 'Año del vehículo',
     minimum: 1950,
     maximum: 2100,
-    required: false
+    required: false,
   })
   @IsOptional()
   @IsInt()
@@ -42,29 +49,29 @@ export class CreateVehicleDto {
   @Max(2100)
   year?: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     example: 'ABC-123',
     description: 'Placa del vehículo',
-    required: false
+    required: false,
   })
   @IsOptional()
   @IsString()
   plate?: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     example: 'Gasolina',
     description: 'Tipo de combustible',
-    required: false
+    required: false,
   })
   @IsOptional()
   @IsString()
   fuelType?: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     example: 50000,
     description: 'Kilometraje actual del vehículo',
     minimum: 0,
-    required: false
+    required: false,
   })
   @IsOptional()
   @IsInt()
