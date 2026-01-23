@@ -53,8 +53,18 @@ export class RoutesService {
     const startedAt = new Date(sorted[0].ts);
     const endedAt = new Date(sorted[sorted.length - 1].ts);
 
+    // Validar que las fechas son válidas
+    if (isNaN(startedAt.getTime()) || isNaN(endedAt.getTime())) {
+      throw new BadRequestException(
+        'Timestamps inválidos: formato de fecha incorrecto',
+      );
+    }
+
     const durationMs = endedAt.getTime() - startedAt.getTime();
-    if (durationMs <= 0) throw new BadRequestException('Timestamps inválidos');
+    if (durationMs < 0)
+      throw new BadRequestException(
+        'Timestamps inválidos: fecha final anterior a la inicial',
+      );
 
     let distanceKm = 0;
     for (let i = 1; i < sorted.length; i++) {
@@ -121,8 +131,8 @@ export class RoutesService {
         createdAt: true,
       },
     });
-    
-    return routes.map(route => ({
+
+    return routes.map((route) => ({
       ...route,
       distanceKm: Number(route.distanceKm),
     }));
@@ -132,7 +142,7 @@ export class RoutesService {
     const route = await this.prisma.route.findUnique({ where: { id } });
     if (!route) throw new NotFoundException('Ruta no encontrada');
     if (route.userId !== userId) throw new ForbiddenException();
-    
+
     return {
       ...route,
       distanceKm: Number(route.distanceKm),
