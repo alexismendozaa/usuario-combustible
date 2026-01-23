@@ -27,8 +27,11 @@
         "ACCESS_COARSE_LOCATION",
         "CAMERA",
         "READ_EXTERNAL_STORAGE",
-        "WRITE_EXTERNAL_STORAGE"
-      ]
+        "WRITE_EXTERNAL_STORAGE",
+        "READ_MEDIA_IMAGES",
+        "ACCESS_NETWORK_STATE"
+      ],
+      "usesCleartextTraffic": true
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -49,7 +52,7 @@
       "expo-font"
     ],
     "extra": {
-      "apiUrl": "http://localhost:3000"
+      "apiUrl": "http://52.202.69.85:3000"
     }
   }
 }
