@@ -1,0 +1,35 @@
+
+services:
+  api:
+    image: ${DOCKER_IMAGE:-fuel-backend}:${IMAGE_TAG:-latest}
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: fuel-api
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    environment:
+      - NODE_ENV=${NODE_ENV:-production}
+      - PORT=${PORT:-3000}
+      - DATABASE_URL
+      - JWT_ACCESS_SECRET
+      - ACCESS_TOKEN_TTL
+      - JWT_REFRESH_SECRET
+      - REFRESH_TOKEN_TTL
+      - APP_PUBLIC_URL
+      - SMTP_HOST
+      - SMTP_PORT
+      - SMTP_USER
+      - SMTP_PASS
+      - MAIL_FROM
+      - S3_PUBLIC_BASE_URL
+      - S3_UPLOAD_PREFIX
+      - STRIPE_SECRET_KEY
+      - STRIPE_WEBHOOK_SECRET
+      - STRIPE_SUCCESS_URL
+      - STRIPE_CANCEL_URL
+      - STRIPE_CURRENCY
+
