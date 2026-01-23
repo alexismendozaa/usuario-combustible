@@ -13,8 +13,10 @@ export class UsersAvatarService {
 
   private getBaseUrlAndPrefix() {
     const baseUrl = this.config.get<string>('S3_PUBLIC_BASE_URL');
-    if (!baseUrl) throw new BadRequestException('S3_PUBLIC_BASE_URL no configurado');
-    const prefix = this.config.get<string>('S3_UPLOAD_PREFIX') || 'uploads/avatars';
+    if (!baseUrl)
+      throw new BadRequestException('S3_PUBLIC_BASE_URL no configurado');
+    const prefix =
+      this.config.get<string>('S3_UPLOAD_PREFIX') || 'uploads/avatars';
     return { baseUrl, prefix };
   }
 
@@ -33,7 +35,8 @@ export class UsersAvatarService {
   }
 
   async setAvatarFromFile(userId: string, file: Express.Multer.File) {
-    if (!file || !file.buffer) throw new BadRequestException('Archivo inválido');
+    if (!file || !file.buffer)
+      throw new BadRequestException('Archivo inválido');
     const { baseUrl, prefix } = this.getBaseUrlAndPrefix();
 
     // Delete previous if exists
@@ -60,7 +63,9 @@ export class UsersAvatarService {
       body: new Uint8Array(file.buffer),
     });
     if (!putRes.ok) {
-      throw new BadRequestException('Error subiendo la imagen al almacenamiento público');
+      throw new BadRequestException(
+        'Error subiendo la imagen al almacenamiento público',
+      );
     }
 
     const avatarUrl = `${baseUrl}/${key}`;
