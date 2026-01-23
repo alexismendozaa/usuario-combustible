@@ -6,28 +6,27 @@ import { Platform } from 'react-native';
 
 // URL base de la API
 // Configuración automática según el entorno:
-// - iOS Simulator/Android Emulator: IP de red local (el simulador de iOS puede acceder a localhost del Mac)
-// - Android Emulator específicamente usa 10.0.2.2
-// - Dispositivo físico: IP de red local
+// - Para desarrollo local con Docker: usar localhost (iOS) o 10.0.2.2 (Android emulador)
+// - Para dispositivo físico: usar la IP de tu Mac/PC en la red local
+// - Para producción: configurar EXPO_PUBLIC_API_BASE_URL
 const getApiBaseUrl = () => {
-  // Permitir override desde variable de entorno
+  // Permitir override desde variable de entorno (PRIORIDAD)
   if (process.env.EXPO_PUBLIC_API_BASE_URL) {
     return process.env.EXPO_PUBLIC_API_BASE_URL;
   }
   
   // Para desarrollo en emulador/simulador
-  // En producción, cambiar a la URL real del servidor
   if (__DEV__) {
-    // Android emulator necesita 10.0.2.2 para acceder al localhost del host
     if (Platform.OS === 'android') {
+      // Android emulator: usa 10.0.2.2 para acceder al localhost del host
       return 'http://10.0.2.2:3000';
     }
-    // iOS simulator y otros pueden usar la IP de red local
-    return 'http://192.168.0.102:3000';
+    // iOS simulator: puede usar localhost directamente
+    return 'http://localhost:3000';
   }
   
-  // Fallback para producción
-  return 'http://192.168.0.102:3000';
+  // Producción: Cambiar esta URL cuando tengas un servidor desplegado
+  return 'http://localhost:3000';
 };
 
 export const API_BASE_URL = getApiBaseUrl();

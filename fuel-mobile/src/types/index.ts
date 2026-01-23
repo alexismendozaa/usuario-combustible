@@ -66,3 +66,19 @@ export const MAINTENANCE_TYPES = [
   { label: 'Inspección general', value: 'inspeccion_general' },
   { label: 'Otro', value: 'otro' },
 ];
+
+/**
+ * Obtiene el label legible de un tipo de mantenimiento
+ * @param value - El valor del tipo de mantenimiento (ej: 'cambio_aceite')
+ * @returns El label formateado (ej: 'Cambio de aceite')
+ */
+export function getMaintenanceLabel(value: string): string {
+  const found = MAINTENANCE_TYPES.find(type => type.value === value);
+  if (found) {
+    return found.label;
+  }
+  // Si no se encuentra, formatear el valor: reemplazar guiones bajos por espacios y capitalizar
+  return value
+    .replace(/_/g, ' ')
+    .replace(/\b\w/g, char => char.toUpperCase());
+}
