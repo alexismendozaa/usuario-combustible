@@ -14,6 +14,7 @@ import {
   Platform,
   ActivityIndicator,
   ImageBackground,
+  Switch,
 } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import * as Location from 'expo-location';
@@ -49,13 +50,45 @@ export default function RefuelFormScreen() {
   const [liters, setLiters] = useState('');
   const [totalCost, setTotalCost] = useState('');
   const [entryMode, setEntryMode] = useState<'gallons' | 'amount'>('gallons');
+  const [odometerError, setOdometerError] = useState<string | undefined>(undefined);
+  const [fullTank, setFullTank] = useState(false); // Por defecto, NO se asume tanque lleno
+
+  // Obtener el odómetro actual del vehículo seleccionado
+  const selectedVehicle = vehicles.find(v => v.id === selectedVehicleId);
+  const currentOdometer = selectedVehicle?.odometerKm || 0;
+  const tankCapacity = selectedVehicle?.tankCapacity ? Number(selectedVehicle.tankCapacity) : null;
 
   const pricePerGallon = selectedFuelType ? FUEL_PRICES[selectedFuelType] : 0;
 
+  // Función para normalizar decimales (acepta comas y puntos)
+  const normalizeDecimal = (value: string) => value.replace(',', '.');
+
+  // Estado para error de galones
+  const [litersError, setLitersError] = useState<string | undefined>(undefined);
+
+  // Validar el odómetro cuando cambia
+  const handleOdometerChange = (value: string) => {
+    setOdometerKm(value);
+    const numValue = parseInt(normalizeDecimal(value));
+    if (value && !isNaN(numValue) && numValue < currentOdometer) {
+      setOdometerError(`Debe ser mayor o igual a ${currentOdometer.toLocaleString()} km`);
+    } else {
+      setOdometerError(undefined);
+    }
+  };
+
   const handleLitersChange = (value: string) => {
     setLiters(value);
+    
+    // Validar que no exceda la capacidad del tanque
+    const gallons = parseFloat(normalizeDecimal(value));
+    if (tankCapacity && !isNaN(gallons) && gallons > tankCapacity) {
+      setLitersError(`Máximo ${tankCapacity} galones (capacidad del tanque)`);
+    } else {
+      setLitersError(undefined);
+    }
+    
     if (entryMode === 'gallons') {
-      const gallons = parseFloat(value);
       if (!isNaN(gallons) && pricePerGallon > 0) {
         setTotalCost((gallons * pricePerGallon).toFixed(2));
       } else {
@@ -67,11 +100,20 @@ export default function RefuelFormScreen() {
   const handleTotalCostChange = (value: string) => {
     setTotalCost(value);
     if (entryMode === 'amount') {
-      const amount = parseFloat(value);
+      const amount = parseFloat(normalizeDecimal(value));
       if (!isNaN(amount) && pricePerGallon > 0) {
-        setLiters((amount / pricePerGallon).toFixed(3));
+        const calculatedGallons = amount / pricePerGallon;
+        setLiters(calculatedGallons.toFixed(3));
+        
+        // Validar que no exceda la capacidad del tanque
+        if (tankCapacity && calculatedGallons > tankCapacity) {
+          setLitersError(`Máximo ${tankCapacity} galones (capacidad del tanque)`);
+        } else {
+          setLitersError(undefined);
+        }
       } else {
         setLiters('');
+        setLitersError(undefined);
       }
     }
   };
@@ -192,6 +234,12 @@ export default function RefuelFormScreen() {
       Alert.alert('Error', 'Ingresa el odómetro');
       return;
     }
+    // Validar que el odómetro no sea menor al actual
+    const odometerValue = parseInt(normalizeDecimal(odometerKm));
+    if (odometerValue < currentOdometer) {
+      Alert.alert('Error', `El odómetro no puede ser menor al actual (${currentOdometer.toLocaleString()} km)`);
+      return;
+    }
     if (!liters.trim()) {
       Alert.alert('Error', 'Ingresa los galones o el valor para calcularlos');
       return;
@@ -200,13 +248,18 @@ export default function RefuelFormScreen() {
       Alert.alert('Error', 'Ingresa el valor o los galones para calcularlo');
       return;
     }
+    // Validar que los galones no excedan la capacidad del tanque
+    if (tankCapacity && parseFloat(normalizeDecimal(liters)) > tankCapacity) {
+      Alert.alert('Error', `Los galones no pueden exceder la capacidad del tanque (${tankCapacity} gal)`);
+      return;
+    }
 
     setSubmitting(true);
     try {
       // Si es pago con Stripe, crear sesión de pago
       if (paymentMethod === 'stripe') {
         const checkoutData = await paymentService.createCheckout({
-          amountCents: Math.round(parseFloat(totalCost) * 100),
+          amountCents: Math.round(parseFloat(normalizeDecimal(totalCost)) * 100),
           description: `Recarga de combustible - ${selectedFuelType}`,
         });
 
@@ -242,10 +295,11 @@ export default function RefuelFormScreen() {
               await refuelService.create({
                 vehicleId: selectedVehicleId,
                 filledAt: new Date().toISOString(),
-                odometerKm: parseInt(odometerKm),
-                liters: parseFloat(liters),
-                totalCost: parseFloat(totalCost),
+                odometerKm: parseInt(normalizeDecimal(odometerKm)),
+                liters: parseFloat(normalizeDecimal(liters)),
+                totalCost: parseFloat(normalizeDecimal(totalCost)),
                 paymentMethod: 'stripe',
+                fullTank,
                 note: stationNote,
                 lat: location?.lat,
                 lng: location?.lng,
@@ -285,10 +339,11 @@ export default function RefuelFormScreen() {
         await refuelService.create({
           vehicleId: selectedVehicleId,
           filledAt: new Date().toISOString(),
-          odometerKm: parseInt(odometerKm),
-          liters: parseFloat(liters),
-          totalCost: parseFloat(totalCost),
+          odometerKm: parseInt(normalizeDecimal(odometerKm)),
+          liters: parseFloat(normalizeDecimal(liters)),
+          totalCost: parseFloat(normalizeDecimal(totalCost)),
           paymentMethod: 'cash',
+          fullTank,
           note: stationNote,
           lat: location?.lat,
           lng: location?.lng,
@@ -407,12 +462,13 @@ export default function RefuelFormScreen() {
 
         {/* Odómetro */}
         <Input
-          label="Odómetro (km)"
-          placeholder="Ej: 45000"
+          label={`Odómetro (km) - Actual: ${currentOdometer.toLocaleString()} km`}
+          placeholder={`Mínimo: ${currentOdometer.toLocaleString()}`}
           value={odometerKm}
-          onChangeText={setOdometerKm}
+          onChangeText={handleOdometerChange}
           keyboardType="decimal-pad"
           required
+          error={odometerError}
         />
 
         {/* Galones */}
@@ -423,7 +479,7 @@ export default function RefuelFormScreen() {
           onChangeText={handleLitersChange}
           keyboardType="decimal-pad"
           required
-          error={!liters ? 'Requerido' : undefined}
+          error={litersError || (!liters ? 'Requerido' : undefined)}
           editable={entryMode === 'gallons'}
         />
 
@@ -455,6 +511,22 @@ export default function RefuelFormScreen() {
             </Text>
           </View>
         )}
+
+        {/* Switch Tanque Lleno */}
+        <View style={styles.switchContainer}>
+          <View style={styles.switchLabelContainer}>
+            <Text style={styles.switchLabel}>¿Llenaste el tanque?</Text>
+            <Text style={styles.switchSubLabel}>
+              Mejora la precisión del cálculo de combustible
+            </Text>
+          </View>
+          <Switch
+            value={fullTank}
+            onValueChange={setFullTank}
+            trackColor={{ false: '#E5E5EA', true: '#34C759' }}
+            thumbColor="#FFFFFF"
+          />
+        </View>
 
         {/* Nota */}
         <Input
@@ -596,5 +668,28 @@ const styles = StyleSheet.create({
   },
   cancelButton: {
     marginBottom: 16,
+  },
+  switchContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    backgroundColor: '#F2F2F7',
+    padding: 16,
+    borderRadius: 12,
+    marginBottom: 16,
+  },
+  switchLabelContainer: {
+    flex: 1,
+    marginRight: 12,
+  },
+  switchLabel: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#000000',
+  },
+  switchSubLabel: {
+    fontSize: 12,
+    color: '#8E8E93',
+    marginTop: 2,
   },
 });
