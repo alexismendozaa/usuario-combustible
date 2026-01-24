@@ -90,6 +90,7 @@ export class ReportsService {
         odometerKm: true,
         liters: true,
         totalCost: true,
+        fullTank: true,
       },
     });
 
@@ -114,17 +115,38 @@ export class ReportsService {
     const totalDistanceKm =
       refuels.length >= 2 ? Math.max(0, lastOdo - firstOdo) : 0;
 
-    // promedio rendimiento común: promedio de (delta odo / litros actuales) desde la 2da recarga
+    // =====================================================
+    // CÁLCULO DEL RENDIMIENTO (km/galón)
+    // =====================================================
+    // Lógica del mundo real:
+    // 1. Usuario carga X galones en km 1000
+    // 2. Recorre distancia consumiendo esos X galones
+    // 3. Cuando se le acaban, vuelve a cargar en km 1500
+    // 
+    // Rendimiento = (km actual - km anterior) / galones de recarga ANTERIOR
+    // 
+    // Ejemplo:
+    // - Recarga 1: km 1000, 5 gal
+    // - Recarga 2: km 1500, 3 gal
+    // Rendimiento = (1500 - 1000) / 5 = 100 km/gal
+    // 
+    // Los 5 galones de la recarga anterior son los que consumió
+    // para llegar de 1000 a 1500 km.
+    // =====================================================
+    
     let sumKmPerLiter = 0;
     let countKmPerLiter = 0;
-
+    
     for (let i = 1; i < refuels.length; i++) {
       const curr = refuels[i];
       const prev = refuels[i - 1];
       const dist = curr.odometerKm - prev.odometerKm;
-      const lit = Number(curr.liters);
-      if (dist >= 0 && lit > 0) {
-        sumKmPerLiter += dist / lit;
+      const prevLiters = Number(prev.liters);
+      
+      // La distancia recorrida se hizo con los galones de la recarga anterior
+      if (dist > 0 && prevLiters > 0) {
+        const kmPerLiter = dist / prevLiters;
+        sumKmPerLiter += kmPerLiter;
         countKmPerLiter++;
       }
     }
