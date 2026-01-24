@@ -140,30 +140,120 @@ export default function DashboardScreen() {
 
   const selectedVehicle = vehicles.find(v => v.id === selectedVehicleId);
   
-  // Cálculo de combustible restante (estimado)
-  const estimatedRemainingFuel = () => {
-    if (!vehicleSummary || !vehicleSummary.avgKmPerLiter || !selectedVehicle) {
-      return null;
+  /**
+   * Cálculo de combustible restante (estimado)
+   * 
+   * Lógica mejorada:
+   * 1. Si el usuario llenó el tanque (fullTank=true), sabemos que después de esa
+   *    recarga tenía el tanque lleno (tankCapacity galones)
+   * 2. Calculamos cuántos galones se han consumido desde esa recarga usando
+   *    el rendimiento promedio (avgKmPerLiter) y los km recorridos
+   * 3. Restamos lo consumido del tanque lleno para obtener lo que queda
+   * 
+   * Si no hay tankCapacity configurada, no podemos calcular el %
+   */
+  type FuelStatus = 
+    | { status: 'ok'; liters: number; percentage: number; isEstimate: boolean }
+    | { status: 'no_tank_capacity' }
+    | { status: 'no_refuels' }
+    | { status: 'no_data' };
+
+  const estimatedRemainingFuel = (): FuelStatus => {
+    if (!selectedVehicle) {
+      return { status: 'no_data' };
     }
     
-    // Asumiendo tanque de 50 galones (puedes ajustar esto)
-    const tankCapacity = 50;
-    const lastRefuel = recentRefuels[0];
+    // Usar la capacidad del tanque del vehículo
+    const tankCapacity = selectedVehicle.tankCapacity 
+      ? Number(selectedVehicle.tankCapacity) 
+      : null;
     
-    if (!lastRefuel) return null;
+    // Si no hay capacidad de tanque configurada
+    if (!tankCapacity) {
+      return { status: 'no_tank_capacity' };
+    }
+
+    // Si no hay recargas
+    if (!recentRefuels || recentRefuels.length === 0) {
+      return { status: 'no_refuels' };
+    }
+
+    // Ordenar recargas por odómetro ascendente (de más antigua a más reciente)
+    const sortedRefuels = [...recentRefuels].sort(
+      (a, b) => a.odometerKm - b.odometerKm
+    );
     
-    // Km recorridos desde última recarga
-    const kmSinceLastRefuel = selectedVehicle.odometerKm - lastRefuel.odometerKm;
+    // Obtener el rendimiento promedio
+    const avgKmPerLiter = vehicleSummary?.avgKmPerLiter;
     
-    // Galones consumidos
-    const litersConsumed = kmSinceLastRefuel / vehicleSummary.avgKmPerLiter;
+    // Si no hay rendimiento, usar estimación de 40 km/gal
+    const kmPerLiter = avgKmPerLiter && avgKmPerLiter > 0 ? avgKmPerLiter : 40;
+    const isEstimate = !avgKmPerLiter || avgKmPerLiter <= 0;
     
-    // Galones restantes
-    const remainingLiters = Math.max(0, Number(lastRefuel.liters) - litersConsumed);
+    // =====================================================
+    // CÁLCULO DEL COMBUSTIBLE RESTANTE
+    // =====================================================
+    // Ir hacia atrás desde la recarga más reciente, acumulando galones
+    // y restando el consumo entre recargas.
+    // 
+    // Ejemplo:
+    // - Recarga 1: km 1000, 5 gal (rendimiento 100 km/gal)
+    // - Recarga 2: km 1200, 2 gal (solo recorrió 200 km, gastó 2 gal, le quedaban 3)
+    // - Ahora en km 1200: tiene 3 + 2 = 5 galones
+    // 
+    // Vamos de la más reciente hacia atrás:
+    // - Empezamos con los galones de la última recarga
+    // - Sumamos lo que quedaba de la anterior (galones - consumo del tramo)
+    // - Paramos si el total supera la capacidad (el tanque se llenó)
+    // =====================================================
+    
+    let totalFuel = 0;
+    
+    for (let i = sortedRefuels.length - 1; i >= 0; i--) {
+      const refuel = sortedRefuels[i];
+      const refuelLiters = Number(refuel.liters);
+      
+      // Sumar los galones de esta recarga
+      totalFuel += refuelLiters;
+      
+      // Si llegamos a la capacidad del tanque, no puede haber más
+      if (totalFuel >= tankCapacity) {
+        totalFuel = tankCapacity;
+        break;
+      }
+      
+      // Si hay una recarga anterior, calcular cuánto se consumió en el tramo
+      if (i > 0) {
+        const prevRefuel = sortedRefuels[i - 1];
+        const distanceInSegment = refuel.odometerKm - prevRefuel.odometerKm;
+        const consumedInSegment = distanceInSegment / kmPerLiter;
+        
+        // Lo que quedaba antes de esta recarga = galones anteriores - consumo
+        // Si el consumo es mayor que lo que teníamos, significa que el tanque estaba vacío
+        // y no debemos seguir sumando hacia atrás
+        const prevRefuelLiters = Number(prevRefuel.liters);
+        if (consumedInSegment >= prevRefuelLiters) {
+          // El usuario gastó todo o más de lo que tenía, no hay remanente
+          break;
+        }
+      }
+    }
+    
+    // Ahora restar lo consumido desde la última recarga hasta el odómetro actual
+    const lastRefuel = sortedRefuels[sortedRefuels.length - 1];
+    const kmSinceLastRefuel = Math.max(0, selectedVehicle.odometerKm - lastRefuel.odometerKm);
+    const consumedSinceLastRefuel = kmSinceLastRefuel / kmPerLiter;
+    
+    const remainingLiters = Math.max(0, totalFuel - consumedSinceLastRefuel);
+    
+    // Porcentaje respecto a la capacidad del tanque
+    const percentage = Math.min(100, Math.max(0, (remainingLiters / tankCapacity) * 100));
     
     return {
+      status: 'ok',
       liters: remainingLiters,
-      percentage: (remainingLiters / tankCapacity) * 100,
+      percentage,
+      isEstimate,
     };
   };
 
@@ -328,7 +418,7 @@ export default function DashboardScreen() {
               {/* Tarjetas de Información - Gasolina y Kilometraje */}
               <View style={styles.infoCardsContainer}>
                 {/* Card Gasolina */}
-                {fuelRemaining && (
+                {fuelRemaining.status === 'ok' ? (
                   <TouchableOpacity 
                     style={styles.infoCard}
                     onPress={() => navigation.navigate('RefuelForm' as any, { vehicleId: selectedVehicle.id })}
@@ -341,7 +431,9 @@ export default function DashboardScreen() {
                       />
                     </View>
                     <View style={styles.infoCardContent}>
-                      <Text style={styles.infoCardLabel}>Combustible</Text>
+                      <Text style={styles.infoCardLabel}>
+                        Combustible{fuelRemaining.isEstimate ? ' ~' : ''}
+                      </Text>
                       <Text style={styles.infoCardValue}>
                         {fuelRemaining.percentage.toFixed(0)}%
                       </Text>
@@ -360,6 +452,70 @@ export default function DashboardScreen() {
                       }
                     ]} />
                   </TouchableOpacity>
+                ) : fuelRemaining.status === 'no_tank_capacity' ? (
+                  <TouchableOpacity 
+                    style={styles.infoCard}
+                    onPress={() => navigation.navigate('VehicleDetail' as any, { vehicleId: selectedVehicle.id })}
+                  >
+                    <View style={styles.infoCardIconContainer}>
+                      <MaterialCommunityIcons 
+                        name="gas-station-outline" 
+                        size={40} 
+                        color="#8E8E93" 
+                      />
+                    </View>
+                    <View style={styles.infoCardContent}>
+                      <Text style={styles.infoCardLabel}>Combustible</Text>
+                      <Text style={[styles.infoCardValue, { fontSize: 11, color: '#8E8E93' }]}>
+                        Configurar
+                      </Text>
+                      <Text style={[styles.infoCardSubtext, { fontSize: 10 }]}>
+                        capacidad tanque
+                      </Text>
+                    </View>
+                    <View style={[styles.infoCardIndicator, { backgroundColor: '#8E8E93' }]} />
+                  </TouchableOpacity>
+                ) : fuelRemaining.status === 'no_refuels' ? (
+                  <TouchableOpacity 
+                    style={styles.infoCard}
+                    onPress={() => navigation.navigate('RefuelForm' as any, { vehicleId: selectedVehicle.id })}
+                  >
+                    <View style={styles.infoCardIconContainer}>
+                      <MaterialCommunityIcons 
+                        name="fuel" 
+                        size={40} 
+                        color="#FF9500" 
+                      />
+                    </View>
+                    <View style={styles.infoCardContent}>
+                      <Text style={styles.infoCardLabel}>Combustible</Text>
+                      <Text style={[styles.infoCardValue, { fontSize: 11, color: '#FF9500' }]}>
+                        Sin datos
+                      </Text>
+                      <Text style={[styles.infoCardSubtext, { fontSize: 10 }]}>
+                        registra recarga
+                      </Text>
+                    </View>
+                    <View style={[styles.infoCardIndicator, { backgroundColor: '#FF9500' }]} />
+                  </TouchableOpacity>
+                ) : (
+                  <View style={styles.infoCard}>
+                    <View style={styles.infoCardIconContainer}>
+                      <MaterialCommunityIcons 
+                        name="gas-station-outline" 
+                        size={40} 
+                        color="#8E8E93" 
+                      />
+                    </View>
+                    <View style={styles.infoCardContent}>
+                      <Text style={styles.infoCardLabel}>Combustible</Text>
+                      <Text style={[styles.infoCardValue, { fontSize: 14, color: '#8E8E93' }]}>
+                        --
+                      </Text>
+                      <Text style={styles.infoCardSubtext}>gal</Text>
+                    </View>
+                    <View style={styles.infoCardIndicator} />
+                  </View>
                 )}
 
                 {/* Card Kilometraje */}
