@@ -22,6 +22,7 @@ export class VehiclesService {
         plate: dto.plate,
         fuelType: dto.fuelType,
         odometerKm: dto.odometerKm ?? 0,
+        tankCapacity: dto.tankCapacity as any,
       },
     });
   }
@@ -54,6 +55,7 @@ export class VehiclesService {
         plate: dto.plate,
         fuelType: dto.fuelType,
         odometerKm: dto.odometerKm,
+        tankCapacity: dto.tankCapacity as any,
       },
     });
   }

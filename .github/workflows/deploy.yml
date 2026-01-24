@@ -1,0 +1,97 @@
+name: Deploy Backend (CI/CD)
+
+on:
+  push:
+    branches:
+      - dev
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.19'
+
+      - name: Install Dependencies
+        run: npm ci
+        working-directory: fuel-backend
+
+      - name: Run Tests
+        run: |
+          npm test
+          npm run test:e2e
+        working-directory: fuel-backend
+
+      - name: Login Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+
+      - name: Build and Push Docker Image
+        run: |
+          cd fuel-backend
+          docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/fuel-backend:latest -t ${{ secrets.DOCKER_HUB_USERNAME }}/fuel-backend:${{ github.sha }} .
+          docker push ${{ secrets.DOCKER_HUB_USERNAME }}/fuel-backend:latest
+          docker push ${{ secrets.DOCKER_HUB_USERNAME }}/fuel-backend:${{ github.sha }}
+      
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            set -e
+
+            # creamos una carpeta
+            mkdir -p /home/ubuntu/fuel-backend
+            cd /home/ubuntu/fuel-backend
+
+            # clonamos o actualizamos el repositorio
+            if [ ! -d ".git" ]; then
+              git clone https://github.com/${{ github.repository }} .
+            else
+              git pull origin main
+            fi
+
+            # Ir al directorio del backend donde está el docker-compose.yml
+            cd fuel-backend
+
+            # pasamos nuestras variables secretas con ayuda de secrets
+            cat << 'EOF' > .env
+            DATABASE_URL=${{ secrets.DATABASE_URL }}
+            PG_SSL=true
+            JWT_ACCESS_SECRET=${{ secrets.JWT_ACCESS_SECRET }}
+            ACCESS_TOKEN_TTL=${{ secrets.ACCESS_TOKEN_TTL }}
+            APP_PUBLIC_URL=${{ secrets.APP_PUBLIC_URL }}
+            SMTP_HOST=${{ secrets.SMTP_HOST }}
+            SMTP_PORT=${{ secrets.SMTP_PORT }}
+            SMTP_USER=${{ secrets.SMTP_USER }}
+            SMTP_PASS=${{ secrets.SMTP_PASS }}
+            MAIL_FROM=${{ secrets.MAIL_FROM }}
+            JWT_REFRESH_SECRET=${{ secrets.JWT_REFRESH_SECRET }}
+            REFRESH_TOKEN_TTL=${{ secrets.REFRESH_TOKEN_TTL }}
+            S3_PUBLIC_BASE_URL=${{ secrets.S3_PUBLIC_BASE_URL }}
+            S3_UPLOAD_PREFIX=${{ secrets.S3_UPLOAD_PREFIX }}
+            STRIPE_SECRET_KEY=${{ secrets.STRIPE_SECRET_KEY }}
+            STRIPE_WEBHOOK_SECRET=${{ secrets.STRIPE_WEBHOOK_SECRET }}
+            STRIPE_SUCCESS_URL=${{ secrets.STRIPE_SUCCESS_URL }}
+            STRIPE_CANCEL_URL=${{ secrets.STRIPE_CANCEL_URL }}
+            STRIPE_CURRENCY=${{ secrets.STRIPE_CURRENCY }}
+            EOF
+
+            # Configurar variables para docker-compose
+            export DOCKER_IMAGE=${{ secrets.DOCKER_HUB_USERNAME }}/fuel-backend
+            export IMAGE_TAG=latest
+
+            # Bajar contenedores anteriores, pull de la nueva imagen y levantar
+            docker compose down || true
+            docker compose pull
+            docker compose up -d

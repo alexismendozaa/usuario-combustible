@@ -1,426 +1,359 @@
 <p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
+  <img src="https://nestjs.com/img/logo-small.svg" width="80" alt="Nest Logo" />
 </p>
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+<h1 align="center">🔧 SmartFuel API</h1>
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
+<p align="center">
+  Backend REST API para la aplicación SmartFuel
 </p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
 
-## Description
+<p align="center">
+  <img src="https://img.shields.io/badge/NestJS-E0234E?style=flat-square&logo=nestjs&logoColor=white" alt="NestJS" />
+  <img src="https://img.shields.io/badge/TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white" alt="TypeScript" />
+  <img src="https://img.shields.io/badge/PostgreSQL-4169E1?style=flat-square&logo=postgresql&logoColor=white" alt="PostgreSQL" />
+  <img src="https://img.shields.io/badge/Prisma-2D3748?style=flat-square&logo=prisma&logoColor=white" alt="Prisma" />
+  <img src="https://img.shields.io/badge/Stripe-635BFF?style=flat-square&logo=stripe&logoColor=white" alt="Stripe" />
+</p>
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+---
 
-## 🚗 Combustible API - Sistema de Gestión de Vehículos
+## 📋 Descripción
 
-API completa para la gestión integral de vehículos, combustible, mantenimiento y pagos. Diseñada con NestJS, PostgreSQL, Prisma y Stripe.
+API REST completa para la gestión integral de vehículos, combustible, mantenimiento y pagos. Construida con NestJS, PostgreSQL y Prisma ORM.
 
-### ✨ Características principales
+---
 
-- 🔐 **Autenticación JWT** - Sistema completo con access/refresh tokens
-- 📧 **Verificación de Email** - Confirmación de cuenta vía correo electrónico
-- 🔑 **Recuperación de contraseña** - Flujo completo con tokens de seguridad
-- 🚙 **Gestión de Vehículos** - CRUD completo con información detallada
-- ⛽ **Registro de Combustible** - Seguimiento de cargas con ubicación GPS
-- 🔧 **Mantenimientos** - Programación y recordatorios automáticos
+## ✨ Características
+
+- 🔐 **Autenticación JWT** - Access + Refresh tokens con rotación segura
+- 📧 **Verificación de Email** - Confirmación de cuenta por correo
+- 🔑 **Recuperación de Contraseña** - Flujo completo con tokens seguros
+- 🚗 **Gestión de Vehículos** - CRUD completo con capacidad de tanque
+- ⛽ **Registro de Combustible** - Tracking con geolocalización y cálculo de rendimiento
+- 🔧 **Mantenimientos** - Programación por km/tiempo con alertas
 - 📊 **Reportes y Analytics** - Estadísticas de consumo y gastos
 - 🗺️ **Rutas GPS** - Almacenamiento de trayectos con coordenadas
-- 🏪 **Estaciones Cercanas** - Búsqueda de gasolineras por ubicación
-- 💳 **Pagos con Stripe** - Checkout Sessions con vouchers automáticos
-- 📬 **Sistema de Emails** - Notificaciones y vouchers HTML
-- �️ **Subida de Avatares** - Almacenamiento de fotos de perfil (S3 compatible)
-- �📝 **Documentación Swagger** - API docs interactiva y completa
-
-### 🛠️ Stack Tecnológico
-
-- **Backend**: NestJS (Node.js + TypeScript)
-- **Database**: PostgreSQL + Prisma ORM
-- **Auth**: JWT (access + refresh tokens)
-- **Emails**: Nodemailer (SMTP)
-- **Pagos**: Stripe API (Checkout + Webhooks)
-- **Docs**: Swagger/OpenAPI
-- **Validation**: class-validator + class-transformer
+- 🏪 **Gasolineras Cercanas** - Búsqueda por ubicación (Overpass API)
+- 💳 **Pagos con Stripe** - Checkout Sessions + Webhooks
+- 🖼️ **Avatares** - Subida de imágenes (S3 compatible)
+- 📝 **Documentación Swagger** - API docs interactiva
 
 ---
 
----
+## 🛠️ Stack Tecnológico
 
-## API Endpoints
-
-### Autenticación (público salvo donde se indica)
-- `POST /auth/register` → `{ email, password, name? }`
-- `POST /auth/login` → `{ email, password }` (devuelve access + refresh token)
-- `GET /auth/me` → requiere `Authorization: Bearer <accessToken>`
-- `POST /auth/verify-email` → `{ token }` (token recibido por correo)
-- `GET /auth/verify-email/confirm/:token` → confirma desde enlace público
-- `POST /auth/forgot-password` → `{ email }` envía correo de reseteo
-- `POST /auth/reset-password` → `{ token, newPassword }` usa token del correo
-- `GET /auth/reset-password/confirm/:token` → devuelve formulario HTML para actualizar la contraseña
-- `POST /auth/reset-password/confirm/:token` → `{ newPassword }` vía formulario (HTML)
-- `POST /auth/refresh` → `{ refreshToken }` obtiene nuevo access token
-- `POST /auth/logout` → `{ refreshToken }` invalida refresh
-
-### Vehículos (requiere autenticación)
-**Prefijo**: `/vehicles`
-
-- `POST /` crear → `{ name, brand?, model?, year?, plate?, fuelType?, odometerKm? }`
-- `GET /` listar propios
-- `GET /:id` obtener detalle
-- `PATCH /:id` actualizar → mismos campos todos opcionales
-- `DELETE /:id` eliminar
-
-### Cargas de combustible (requiere autenticación)
-**Prefijo**: `/refuels`
-
-- `POST /` crear → `{ vehicleId, filledAt?, odometerKm, liters, totalCost, note?, lat?, lng? }`
-- `GET /` listar, opcional `?vehicleId=`
-- `GET /:id` obtener
-- `PATCH /:id` actualizar → mismos campos opcionales
-- `DELETE /:id` eliminar
-
-### Mantenimiento (requiere autenticación)
-**Prefijo**: `/maintenance`
-
-- `POST /items` crear tarea → `{ vehicleId, title, notes?, intervalKm?, intervalMonths?, lastDoneOdometerKm?, lastDoneAt? }`
-- `GET /items` listar, opcional `?vehicleId=`
-- `GET /items/:id` obtener
-- `PATCH /items/:id` actualizar → mismos campos opcionales
-- `DELETE /items/:id` eliminar
-- `POST /items/:id/log` marcar como realizado → `{ doneAt?, odometerKm?, cost?, note? }`
-- `GET /items/:id/logs` historial de logs
-- `GET /due` pendientes, opcional `?vehicleId=` y `?odometerKm=` (para calcular próximos)
-
-### Reportes (requiere autenticación)
-**Prefijo**: `/reports`
-
-- `GET /vehicles/:vehicleId/summary` resumen de gastos y totales
-- `GET /vehicles/:vehicleId/monthly?month=YYYY-MM` métricas mensuales
-- `GET /vehicles/:vehicleId/timeline?limit=50` eventos ordenados (limit opcional)
-
-### Rutas (GPS) (requiere autenticación)
-**Prefijo**: `/routes`
-
-- `POST /` crear ruta → `{ vehicleId?, name?, points: [{ lat, lng, ts(ISO) }, ...] }`
-- `GET /` listar rutas del usuario (resumen)
-- `GET /:id` obtener ruta completa (incluye `points`)
-- `DELETE /:id` eliminar ruta
-
-### Estaciones (público)
-**Prefijo**: `/stations`
-
-- `GET /nearby?lat=<num>&lng=<num>&radius=<num?>` estaciones cercanas
-  - **Parámetros**:
-    - `lat` (requerido): latitud en grados decimales. Ej: `19.4326`
-    - `lng` (requerido): longitud en grados decimales. Ej: `-99.1332`
-    - `radius` (opcional): radio en metros (200–10000). Por defecto `2000`
-  - **Respuesta**: `{ count, stations: [{ id, name, brand?, operator?, lat, lng, address? }] }`
-
-### Pagos / Stripe
-**Prefijo**: `/payments`
-
-- `POST /checkout` (requiere autenticación) → crear sesión de pago
-  - **Body**: `{ amountCents: number, description?: string }`
-  - **Respuesta**: `{ paymentId: string, checkoutUrl: string }`
-  - El usuario debe visitar `checkoutUrl` para completar el pago en Stripe
-  - Al completar el pago:
-    - El webhook crea una factura en Stripe
-    - Stripe enviará automáticamente el recibo oficial por email
-    - El pago se marca como "paid" en la base de datos
-- `GET /` (requiere autenticación) → listar historial de pagos del usuario
-- `POST /webhook` (público, solo para Stripe) → webhook de eventos Stripe
-  - Verifica firma con `STRIPE_WEBHOOK_SECRET`
-  - Procesa `checkout.session.completed` para:
-    - Marcar el pago como completado en la base de datos
-    - Crear una factura en Stripe (que genera el recibo oficial)
-    - Stripe envía automáticamente el recibo por correo electrónico
-
-### Usuario (requiere autenticación)
-**Prefijo**: `/users/me`
-
-- `GET /` → obtener perfil del usuario autenticado
-  - **Respuesta**: `{ userId, email, name?, avatarUrl? }`
-- `PATCH /name` → actualizar nombre del usuario
-  - **Body**: `{ name: string }`
-  - **Respuesta**: `{ id, email, name, avatarUrl }`
-- `PATCH /email` → solicitar cambio de email
-  - **Body**: `{ newEmail: string }`
-  - **Respuesta**: `{ message: "Se ha enviado un correo de verificación a nuevo@ejemplo.com..." }`
-  - **Flujo**: 
-    1. Usuario solicita cambio con el nuevo email
-    2. Se envía un correo de verificación al NUEVO email
-    3. Usuario confirma el enlace recibido (GET automático al hacer clic)
-    4. El email se actualiza en la base de datos
-- `GET /email/confirm/:token` → confirmar cambio de email
-  - **Parámetro**: `token` (recibido en el correo de verificación)
-  - **Acceso**: Vía enlace público en el correo (no requiere autenticación)
-  - **Respuesta**: `{ id, email, name, message: "Email actualizado correctamente" }`
-- `PATCH /password` → cambiar contraseña del usuario
-  - **Body**: `{ currentPassword: string, newPassword: string }`
-  - **Respuesta**: `{ ok: true, message: "Contraseña actualizada correctamente" }`
-  - **Nota**: Requiere verificar la contraseña actual para mayor seguridad
-- `DELETE /` → eliminar cuenta del usuario
-  - **Respuesta**: `{ ok: true, message: "Cuenta eliminada correctamente" }`
-  - **Nota**: Esta acción es permanente y eliminará todos los datos asociados al usuario
-
-**Avatar**: `/users/me/avatar`
-
-- `POST /` → subir/reemplazar avatar
-  - **Content-Type**: `multipart/form-data`
-  - **Field**: `file` (imagen JPG, PNG o WebP)
-  - **Límite**: 5MB máximo
-  - **Respuesta**: `{ ok: true, user: { id, email, name?, avatarUrl } }`
-  - Las imágenes se almacenan en un servidor de archivos estático (compatible con S3)
-- `GET /` → obtener URL del avatar actual
-- `DELETE /` → eliminar avatar del usuario
-
-### Salud
-- `GET /` responde string de prueba
+| Tecnología | Uso |
+|------------|-----|
+| **NestJS** | Framework backend |
+| **TypeScript** | Lenguaje de programación |
+| **PostgreSQL** | Base de datos |
+| **Prisma** | ORM |
+| **JWT** | Autenticación |
+| **Nodemailer** | Envío de emails |
+| **Stripe** | Procesamiento de pagos |
+| **Swagger** | Documentación API |
+| **class-validator** | Validación de DTOs |
 
 ---
 
-## Project setup
+## 📁 Estructura del Proyecto
 
-```bash
-$ npm install
+```
+fuel-backend/
+├── src/
+│   ├── auth/              # Autenticación y autorización
+│   │   ├── dto/           # DTOs de auth
+│   │   ├── mail/          # Templates de email
+│   │   ├── auth.controller.ts
+│   │   ├── auth.service.ts
+│   │   ├── jwt.strategy.ts
+│   │   └── jwt-auth.guard.ts
+│   ├── users/             # Gestión de usuarios
+│   ├── vehicles/          # Gestión de vehículos
+│   ├── refuels/           # Registro de cargas
+│   ├── maintenance/       # Mantenimientos
+│   ├── routes/            # Rutas GPS
+│   ├── reports/           # Reportes y analytics
+│   ├── stations/          # Gasolineras cercanas
+│   ├── payments/          # Pagos con Stripe
+│   └── common/            # Filtros y excepciones
+├── prisma/
+│   ├── schema.prisma      # Esquema de BD
+│   └── migrations/        # Migraciones
+├── test/                  # Tests e2e
+└── docker-compose.yml     # Configuración Docker
 ```
 
-## Database Setup (Prisma)
+---
 
-Este proyecto usa Prisma como ORM con PostgreSQL. Asegúrate de tener PostgreSQL instalado y configurado.
+## 🚀 Instalación
 
-### 1. Configurar variables de entorno
+### Requisitos
+- Node.js 18+
+- PostgreSQL 14+
+- npm o yarn
 
-Crea un archivo `.env` en la raíz del proyecto con la siguiente configuración:
+### 1. Clonar e instalar dependencias
+```bash
+cd fuel-backend
+npm install
+```
 
+### 2. Configurar variables de entorno
+```bash
+cp .env.example .env
+```
+
+Editar `.env`:
 ```env
-DATABASE_URL="postgresql://usuario:password@localhost:5432/nombre_db?schema=public"
+# Database
+DATABASE_URL="postgresql://user:password@localhost:5432/smartfuel"
 
-# JWT (access)
-JWT_ACCESS_SECRET="tu_secreto_access"
-ACCESS_TOKEN_TTL=900          # 15 minutos en segundos
+# JWT
+JWT_SECRET="tu-secreto-super-seguro"
+JWT_EXPIRES_IN="15m"
+JWT_REFRESH_SECRET="otro-secreto-seguro"
+JWT_REFRESH_EXPIRES_IN="7d"
 
-# JWT (refresh)
-JWT_REFRESH_SECRET="tu_secreto_refresh"
-REFRESH_TOKEN_TTL=2592000     # 30 días en segundos
-
-# Correo (SMTP)
-SMTP_HOST="smtp.ejemplo.com"
+# Email (SMTP)
+SMTP_HOST="smtp.gmail.com"
 SMTP_PORT=587
-SMTP_USER="tu_email@ejemplo.com"
-SMTP_PASS="tu_password"
-MAIL_FROM="noreply@tuapp.com"  # Opcional, usa SMTP_USER si no se define
-APP_PUBLIC_URL="http://localhost:3000"  # URL base para enlaces en emails
+SMTP_USER="tu-email@gmail.com"
+SMTP_PASS="tu-app-password"
+EMAIL_FROM="SmartFuel <noreply@smartfuel.com>"
 
-# Stripe (Pagos)
-STRIPE_SECRET_KEY="sk_test_..."           # Clave secreta de Stripe (Test mode)
-STRIPE_WEBHOOK_SECRET="whsec_..."         # Secret del webhook (obtener de Stripe CLI o Dashboard)
-STRIPE_CURRENCY="usd"                     # Moneda por defecto (usd, mxn, eur, etc.)
-STRIPE_SUCCESS_URL="http://localhost:3000/payment/success"  # Redirección al completar pago
-STRIPE_CANCEL_URL="http://localhost:3000/payment/cancel"    # Redirección al cancelar pago
+# Stripe
+STRIPE_SECRET_KEY="sk_test_..."
+STRIPE_WEBHOOK_SECRET="whsec_..."
 
-# S3 / Almacenamiento de Archivos (Avatares)
-S3_PUBLIC_BASE_URL="http://localhost:3001"  # URL base del servidor de archivos (puede ser S3, Cloudflare R2, o servidor local)
-S3_UPLOAD_PREFIX="uploads/avatars"          # Prefijo para organizar archivos (opcional, default: uploads/avatars)
+# Frontend URL (para emails)
+FRONTEND_URL="http://localhost:3000"
+
+# S3 (opcional, para avatares)
+S3_ENDPOINT="https://s3.amazonaws.com"
+S3_BUCKET="smartfuel-avatars"
+S3_ACCESS_KEY="..."
+S3_SECRET_KEY="..."
 ```
 
-> **Nota sobre almacenamiento**: Este proyecto usa un servidor de archivos compatible con S3 API para subir avatares. Puedes usar:
-> - **Desarrollo local**: Un servidor HTTP simple que acepte PUT/DELETE (ej: `python -m http.server 3001`)
-> - **S3**: AWS S3 con URLs pre-firmadas
-> - **Cloudflare R2**: Compatible con S3 API
-> - **MinIO**: Servidor de almacenamiento de objetos auto-hospedado
-
-### 2. Habilitar extensión pgcrypto en PostgreSQL
-
-Antes de ejecutar las migraciones, conecta a tu base de datos PostgreSQL y ejecuta:
-
-```sql
-CREATE EXTENSION IF NOT EXISTS "pgcrypto";
-```
-
-Esto es necesario para generar UUIDs con `gen_random_uuid()`.
-
-### 3. Ejecutar migraciones de Prisma
-
+### 3. Ejecutar migraciones
 ```bash
-# Eliminar base de datos y recrearla con todas las migraciones (CUIDADO: esto borra todos los datos)
-$ npx prisma migrate reset
-
-# O aplicar migraciones pendientes sin borrar datos
-$ npx prisma migrate deploy
-
-# O crear una nueva migración después de cambios en schema.prisma
-$ npx prisma migrate dev --name nombre_de_tu_migracion
-```
-
-Si ves el error P3009 (migración fallida en destino), puedes rebaselinar en desarrollo:
-
-```bash
-# 1) (opcional) Habilitar pgcrypto si no existe
-psql "$DATABASE_URL" -c 'CREATE EXTENSION IF NOT EXISTS "pgcrypto";'
-
-# 2) Eliminar la migración fallida local y crear una inicial desde el schema actual
-rm -rf prisma/migrations/*
-npx prisma migrate dev --name init
+npx prisma migrate deploy
 npx prisma generate
 ```
 
-### 4. Generar Prisma Client
-
-Después de las migraciones, genera el cliente de Prisma:
-
+### 4. Iniciar servidor
 ```bash
-$ npx prisma generate
+# Desarrollo
+npm run start:dev
+
+# Producción
+npm run build
+npm run start:prod
 ```
 
-### 5. (Opcional) Abrir Prisma Studio para ver/editar datos
+---
 
-```bash
-$ npx prisma studio
+## 📖 API Endpoints
+
+### 🔐 Autenticación (`/auth`)
+
+| Método | Endpoint | Descripción |
+|--------|----------|-------------|
+| POST | `/auth/register` | Registrar usuario |
+| POST | `/auth/login` | Iniciar sesión |
+| GET | `/auth/me` | Obtener usuario actual |
+| POST | `/auth/refresh` | Renovar access token |
+| POST | `/auth/logout` | Cerrar sesión |
+| POST | `/auth/verify-email` | Verificar email con token |
+| POST | `/auth/forgot-password` | Solicitar reset de contraseña |
+| POST | `/auth/reset-password` | Resetear contraseña |
+
+### 👤 Usuarios (`/users`)
+
+| Método | Endpoint | Descripción |
+|--------|----------|-------------|
+| GET | `/users/me` | Obtener perfil |
+| PATCH | `/users/me` | Actualizar perfil |
+| POST | `/users/me/avatar` | Subir avatar |
+| DELETE | `/users/me/avatar` | Eliminar avatar |
+| DELETE | `/users/me` | Eliminar cuenta |
+
+### 🚗 Vehículos (`/vehicles`)
+
+| Método | Endpoint | Descripción |
+|--------|----------|-------------|
+| GET | `/vehicles` | Listar vehículos |
+| POST | `/vehicles` | Crear vehículo |
+| GET | `/vehicles/:id` | Obtener vehículo |
+| PATCH | `/vehicles/:id` | Actualizar vehículo |
+| DELETE | `/vehicles/:id` | Eliminar vehículo |
+
+**Campos del vehículo:**
+```json
+{
+  "name": "Mi Auto",
+  "brand": "Toyota",
+  "model": "Corolla",
+  "year": 2020,
+  "plate": "ABC-123",
+  "fuelType": "gasoline",
+  "odometerKm": 50000,
+  "tankCapacity": 12.5
+}
 ```
 
-## Stripe Setup (Pagos)
+### ⛽ Recargas (`/refuels`)
 
-Este proyecto integra Stripe para procesar pagos mediante Checkout Sessions. Sigue estos pasos para configurar Stripe:
+| Método | Endpoint | Descripción |
+|--------|----------|-------------|
+| GET | `/refuels` | Listar recargas |
+| POST | `/refuels` | Crear recarga |
+| GET | `/refuels/:id` | Obtener recarga |
+| PATCH | `/refuels/:id` | Actualizar recarga |
+| DELETE | `/refuels/:id` | Eliminar recarga |
+| GET | `/refuels/current-odometer/:vehicleId` | Obtener odómetro actual |
 
-### 1. Crear cuenta en Stripe
-
-1. Regístrate en [Stripe](https://stripe.com)
-2. Activa el **modo Test** (toggle en el Dashboard)
-3. Obtén tus claves API desde [API Keys](https://dashboard.stripe.com/test/apikeys):
-   - `STRIPE_SECRET_KEY` (comienza con `sk_test_...`)
-
-### 2. Configurar Webhook Local (desarrollo)
-
-Para probar webhooks localmente, usa **Stripe CLI**:
-
-```bash
-# Instalar Stripe CLI (macOS)
-brew install stripe/stripe-cli/stripe
-
-# Autenticar
-stripe login
-
-# Escuchar webhooks y reenviarlos a tu servidor local
-stripe listen --forward-to localhost:3000/payments/webhook
+**Campos de la recarga:**
+```json
+{
+  "vehicleId": "uuid",
+  "odometerKm": 51000,
+  "liters": 10.5,
+  "totalCost": 28.50,
+  "paymentMethod": "cash",
+  "fullTank": true,
+  "note": "Gasolinera del centro",
+  "lat": -0.1234,
+  "lng": -78.5678
+}
 ```
 
-Esto te dará un **webhook signing secret** (`whsec_...`). Cópialo y agrégalo a tu `.env` como `STRIPE_WEBHOOK_SECRET`.
+**Validaciones:**
+- El odómetro no puede ser menor al anterior
+- Los galones no pueden exceder la capacidad del tanque
 
-### 3. Probar el flujo de pago
+### 🔧 Mantenimiento (`/maintenance`)
 
-1. **Crear Checkout**: `POST /payments/checkout` con `{ amountCents: 5000, description: "Test" }`
-2. **Completar pago**: Visita el `checkoutUrl` retornado
-3. **Usar tarjeta de prueba**: `4242 4242 4242 4242` (fecha futura, cualquier CVC)
-4. **Verificar webhook**: El webhook procesará `checkout.session.completed` y:
-   - Marcará el pago como `paid` en tu DB
-   - Enviará un voucher HTML por email
+| Método | Endpoint | Descripción |
+|--------|----------|-------------|
+| GET | `/maintenance/items` | Listar tareas |
+| POST | `/maintenance/items` | Crear tarea |
+| PATCH | `/maintenance/items/:id` | Actualizar tarea |
+| DELETE | `/maintenance/items/:id` | Eliminar tarea |
+| POST | `/maintenance/items/:id/complete` | Marcar como realizada |
+| GET | `/maintenance/logs` | Historial de mantenimientos |
 
-### 4. Webhooks en producción
+### 📊 Reportes (`/reports`)
 
-1. Crea un webhook endpoint en [Stripe Dashboard → Webhooks](https://dashboard.stripe.com/webhooks)
-2. URL: `https://tudominio.com/payments/webhook`
-3. Eventos: Selecciona `checkout.session.completed`
-4. Copia el **Signing Secret** y úsalo como `STRIPE_WEBHOOK_SECRET` en producción
+| Método | Endpoint | Descripción |
+|--------|----------|-------------|
+| GET | `/reports/timeline/:vehicleId` | Timeline de recargas |
+| GET | `/reports/summary/:vehicleId` | Resumen del vehículo |
+| GET | `/reports/monthly/:vehicleId` | Métricas mensuales |
 
-## Compile and run the project
+**Resumen incluye:**
+- Total de recargas
+- Total de galones
+- Total gastado
+- Distancia total recorrida
+- Rendimiento promedio (km/gal)
+- Costo promedio por km
 
-```bash
-# development
-$ npm run start
+### 🗺️ Rutas (`/routes`)
 
-# watch mode
-$ npm run start:dev
+| Método | Endpoint | Descripción |
+|--------|----------|-------------|
+| GET | `/routes` | Listar rutas |
+| POST | `/routes` | Guardar ruta |
+| GET | `/routes/:id` | Obtener ruta |
+| DELETE | `/routes/:id` | Eliminar ruta |
 
-# production mode
-$ npm run start:prod
+### 🏪 Gasolineras (`/stations`)
+
+| Método | Endpoint | Descripción |
+|--------|----------|-------------|
+| GET | `/stations/nearby` | Buscar cercanas |
+
+Query params: `?lat=-0.123&lng=-78.567&radiusKm=5`
+
+### 💳 Pagos (`/payments`)
+
+| Método | Endpoint | Descripción |
+|--------|----------|-------------|
+| POST | `/payments/checkout` | Crear sesión de pago |
+| GET | `/payments` | Listar pagos |
+| POST | `/payments/webhook` | Webhook de Stripe |
+
+---
+
+## 📊 Modelo de Datos
+
+```
+User
+ ├── Vehicle (1:N)
+ │    ├── Refuel (1:N)
+ │    ├── MaintenanceItem (1:N)
+ │    │    └── MaintenanceLog (1:N)
+ │    └── Route (1:N)
+ ├── Payment (1:N)
+ ├── EmailVerificationToken (1:N)
+ ├── PasswordResetToken (1:N)
+ └── RefreshToken (1:N)
 ```
 
-## Swagger
+---
 
-- **Documentación interactiva**: http://localhost:3000/docs
-- **Autenticación en Swagger**: 
-  1. Regístrate/inicia sesión para obtener un `accessToken`
-  2. Haz clic en el botón **"Authorize"** (🔓 arriba a la derecha)
-  3. Ingresa: `Bearer {tu-accessToken}` (ejemplo: `Bearer eyJhbGc...`)
-  4. Haz clic en "Authorize" y luego "Close"
-  5. Ahora puedes probar todos los endpoints protegidos
+## 🧮 Lógica de Cálculos
 
-### Endpoints disponibles en Swagger
+### Rendimiento (km/galón)
+```
+Rendimiento = Distancia recorrida / Galones de la recarga ANTERIOR
+```
 
-- **Auth**: Registro, login, verificación de email, recuperación de contraseña
-- **Vehículos**: CRUD completo de vehículos
-- **Cargas de Combustible**: Registro y gestión de recargas
-- **Mantenimiento**: Programación y seguimiento de mantenimientos
-- **Reportes**: Estadísticas y análisis por vehículo
-- **Rutas**: Almacenar y consultar rutas GPS
-- **Estaciones**: Buscar estaciones de gasolina cercanas
-- **Pagos / Stripe**: Crear checkouts y ver historial de pagos
-- **Usuario**: Gestión de perfil y avatar
-- **Avatar**: Subir/eliminar foto de perfil (hasta 5MB)
+Los galones que cargaste en la recarga anterior son los que consumiste para llegar a la siguiente recarga.
 
-## Run tests
+### Combustible Restante
+1. Suma los galones de recargas recientes
+2. Resta el consumo estimado basado en km recorridos
+3. Considera recargas parciales (acumula si no gastó todo)
+4. Limita al máximo de la capacidad del tanque
+
+---
+
+## 🧪 Testing
 
 ```bash
-# unit tests
-$ npm run test
+# Unit tests
+npm run test
 
 # e2e tests
-$ npm run test:e2e
+npm run test:e2e
 
-# test coverage
-$ npm run test:cov
+# Coverage
+npm run test:cov
 ```
 
-## Deployment
+---
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+## 📝 Swagger Documentation
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+Una vez iniciado el servidor, accede a:
+```
+http://localhost:3000/api
+```
+
+---
+
+## 🐳 Docker
 
 ```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+docker-compose up -d
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+---
 
-## Resources
+## 📄 Licencia
 
-Check out a few resources that may come in handy when working with NestJS:
-
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+Proyecto privado - Todos los derechos reservados.

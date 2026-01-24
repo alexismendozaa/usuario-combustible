@@ -26,10 +26,15 @@ export default function VehicleFormScreen() {
   const [name, setName] = useState('');
   const [vehicleType, setVehicleType] = useState('');
   const [brand, setBrand] = useState('');
+  const [model, setModel] = useState('');
   const [year, setYear] = useState('');
   const [plate, setPlate] = useState('');
   const [odometerKm, setOdometerKm] = useState('0');
   const [fuelType, setFuelType] = useState('');
+  const [tankCapacity, setTankCapacity] = useState('');
+
+  // Función para normalizar decimales (acepta comas y puntos)
+  const normalizeDecimal = (value: string) => value.replace(',', '.');
 
   const handleSubmit = async () => {
     if (!name.trim()) {
@@ -47,11 +52,12 @@ export default function VehicleFormScreen() {
       await vehicleService.create({
         name: name.trim(),
         brand: brand.trim() || undefined,
-        model: vehicleType, // Guardamos el tipo en model
+        model: model.trim() || vehicleType, // Modelo del vehículo, o tipo si no hay modelo
         year: year ? parseInt(year) : undefined,
         plate: plate.trim() || undefined,
-        odometerKm: odometerKm ? parseFloat(odometerKm) : 0,
+        odometerKm: odometerKm ? parseFloat(normalizeDecimal(odometerKm)) : 0,
         fuelType: fuelType || undefined,
+        tankCapacity: tankCapacity ? parseFloat(normalizeDecimal(tankCapacity)) : undefined,
       });
 
       Alert.alert('Éxito', 'Vehículo creado correctamente');
@@ -113,6 +119,14 @@ export default function VehicleFormScreen() {
           />
 
           <Input
+            label="Modelo"
+            placeholder="Corolla, Civic, Serie 3, etc."
+            value={model}
+            onChangeText={setModel}
+            autoCapitalize="words"
+          />
+
+          <Input
             label="Año"
             placeholder="2020"
             value={year}
@@ -133,6 +147,14 @@ export default function VehicleFormScreen() {
             placeholder="0"
             value={odometerKm}
             onChangeText={setOdometerKm}
+            keyboardType="decimal-pad"
+          />
+
+          <Input
+            label="Capacidad del tanque (galones)"
+            placeholder="Ej: 15.5"
+            value={tankCapacity}
+            onChangeText={setTankCapacity}
             keyboardType="decimal-pad"
           />
 
