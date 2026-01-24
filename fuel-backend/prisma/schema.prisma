@@ -94,6 +94,7 @@ model Vehicle {
   plate      String?
   fuelType   String?
   odometerKm Int      @default(0)
+  tankCapacity Decimal? @db.Decimal(5, 2) // Capacidad del tanque en galones
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
@@ -116,6 +117,7 @@ model Refuel {
   liters     Decimal
   totalCost  Decimal
   paymentMethod String @default("cash")
+  fullTank   Boolean  @default(true) // Si llenó el tanque completo
 
   note       String?
   lat        Decimal?

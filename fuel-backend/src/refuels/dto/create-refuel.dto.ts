@@ -1,4 +1,5 @@
 import {
+  IsBoolean,
   IsDateString,
   IsInt,
   IsNumber,
@@ -90,4 +91,13 @@ export class CreateRefuelDto {
   @IsOptional()
   @IsNumber()
   lng?: number;
+
+  @ApiProperty({
+    example: true,
+    description: 'Si se llenó el tanque completo',
+    default: true,
+  })
+  @IsOptional()
+  @IsBoolean()
+  fullTank?: boolean;
 }
