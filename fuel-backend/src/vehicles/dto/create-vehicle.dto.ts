@@ -1,5 +1,6 @@
 import {
   IsInt,
+  IsNumber,
   IsOptional,
   IsString,
   Max,
@@ -77,4 +78,17 @@ export class CreateVehicleDto {
   @IsInt()
   @Min(0)
   odometerKm?: number;
+
+  @ApiProperty({
+    example: 15.5,
+    description: 'Capacidad del tanque en galones',
+    minimum: 1,
+    maximum: 100,
+    required: false,
+  })
+  @IsOptional()
+  @IsNumber()
+  @Min(1)
+  @Max(100)
+  tankCapacity?: number;
 }
