@@ -32,6 +32,10 @@ export default function VehicleDetailScreen() {
   const [plate, setPlate] = useState('');
   const [odometerKm, setOdometerKm] = useState('');
   const [fuelType, setFuelType] = useState('');
+  const [tankCapacity, setTankCapacity] = useState('');
+
+  // Función para normalizar decimales (acepta comas y puntos)
+  const normalizeDecimal = (value: string) => value.replace(',', '.');
 
   useEffect(() => {
     loadVehicle();
@@ -48,6 +52,7 @@ export default function VehicleDetailScreen() {
       setPlate(data.plate || '');
       setOdometerKm(data.odometerKm.toString());
       setFuelType(data.fuelType || '');
+      setTankCapacity(data.tankCapacity?.toString() || '');
     } catch (error) {
       Alert.alert('Error', 'No se pudo cargar el vehículo');
       navigation.goBack();
@@ -70,8 +75,9 @@ export default function VehicleDetailScreen() {
         model: model.trim() || undefined,
         year: year ? parseInt(year) : undefined,
         plate: plate.trim() || undefined,
-        odometerKm: odometerKm ? parseFloat(odometerKm) : undefined,
+        odometerKm: odometerKm ? parseFloat(normalizeDecimal(odometerKm)) : undefined,
         fuelType: fuelType.trim() || undefined,
+        tankCapacity: tankCapacity ? parseFloat(normalizeDecimal(tankCapacity)) : undefined,
       };
 
       await vehicleService.update(vehicleId, updateData);
@@ -153,6 +159,14 @@ export default function VehicleDetailScreen() {
           placeholder="Gasolina"
           value={fuelType}
           onChangeText={setFuelType}
+        />
+
+        <Input
+          label="Capacidad del tanque (galones)"
+          placeholder="Ej: 15.5"
+          value={tankCapacity}
+          onChangeText={setTankCapacity}
+          keyboardType="decimal-pad"
         />
 
         <Button
