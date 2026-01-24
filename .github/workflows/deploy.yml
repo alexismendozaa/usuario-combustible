@@ -3,7 +3,7 @@ name: Deploy Backend (CI/CD)
 on:
   push:
     branches:
-      - dev
+      - prod
 
 jobs:
   deploy:
