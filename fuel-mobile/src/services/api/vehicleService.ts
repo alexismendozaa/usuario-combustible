@@ -12,6 +12,7 @@ export interface CreateVehicleData {
   plate?: string;
   fuelType?: string;
   odometerKm?: number;
+  tankCapacity?: number;
 }
 
 export interface UpdateVehicleData extends Partial<CreateVehicleData> {}
@@ -26,6 +27,7 @@ export interface Vehicle {
   plate?: string;
   fuelType?: string;
   odometerKm: number;
+  tankCapacity?: number;
   createdAt: string;
   updatedAt: string;
 }
