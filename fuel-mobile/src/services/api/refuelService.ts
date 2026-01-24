@@ -10,6 +10,8 @@ export interface CreateRefuelData {
   odometerKm: number;
   liters: number;
   totalCost: number;
+  paymentMethod?: string;
+  fullTank?: boolean;
   note?: string;
   lat?: number;
   lng?: number;
@@ -26,6 +28,7 @@ export interface Refuel {
   liters: number;
   totalCost: number;
   paymentMethod?: string;
+  fullTank?: boolean;
   note?: string;
   lat?: number;
   lng?: number;
